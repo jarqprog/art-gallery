@@ -1,11 +1,18 @@
-package com.jarqprog.artgallery
+package com.jarqprog.artwriteapi
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class ArtGalleryApplication
+class ArtReadApi
 
 fun main(args: Array<String>) {
-	runApplication<ArtGalleryApplication>(*args)
+    runApplication<ArtReadApi>(*args)
 }
+
+
+
+
+
+
+
