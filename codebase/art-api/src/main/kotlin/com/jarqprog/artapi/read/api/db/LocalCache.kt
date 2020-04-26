@@ -1,4 +1,4 @@
-package com.jarqprog.artapi.read.database
+package com.jarqprog.artapi.read.api.db
 
 import java.util.*
 

@@ -6,7 +6,9 @@ import java.util.*
 abstract class BaseModel (
         private val uuid: UUID,
         private val date: LocalDateTime,
-        private val archived: Boolean) {
+        private val archived: Boolean,
+        private val metadata: MetadataModel
+) {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -21,4 +23,9 @@ abstract class BaseModel (
     fun uuid() = uuid
     fun date() = date
     fun archived() = archived
+    fun metadata(): MetadataModel = metadata
+
+    override fun toString(): String {
+        return "BaseModel(uuid=$uuid, date=$date, archived=$archived, meta=$metadata)"
+    }
 }
