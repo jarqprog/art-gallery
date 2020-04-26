@@ -1,6 +1,8 @@
 package com.jarqprog.artapi.read
 
-import com.jarqprog.artapi.read.database.*
+import com.jarqprog.artapi.read.api.*
+import com.jarqprog.artapi.read.api.db.CommentCache
+import com.jarqprog.artapi.read.api.db.CommentReadRepository
 import org.davidmoten.rx.jdbc.ConnectionProvider
 import org.davidmoten.rx.jdbc.Database
 import org.springframework.beans.factory.annotation.Autowired
@@ -21,9 +23,9 @@ class ReadModule {
     }
 
     @Bean
-    fun databasePlugin(@Autowired database: Database): ReadDatabaseFacade {
+    fun databasePlugin(@Autowired database: Database): ReadFacade {
         val readRepository = CommentReadRepository(database)
         val cache = CommentCache()
-        return DatabasePlugin(readRepository, cache)
+        return ReadPlugin(readRepository, cache)
     }
 }
