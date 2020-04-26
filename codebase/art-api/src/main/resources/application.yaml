@@ -1,0 +1,4 @@
+#spring:
+#  data:
+#    mongodb:
+#      uri: mongodb+srv://jarqprog:1234@jqmongodb-qzcsq.mongodb.net/test?retryWrites=true&w=majority
