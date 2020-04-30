@@ -1,4 +1,4 @@
-package com.jarqprog.artapi.read.api.db
+package com.jarqprog.artapi.query.storage
 
 import java.time.LocalDateTime
 import java.util.*
