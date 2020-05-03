@@ -10,5 +10,5 @@ interface ArtRepository {
 
     fun getByUUID(uuid: UUID): Art
 
-    fun getByUUIDat(uuid: UUID, at: Instant): Art
+    fun getByUuidAt(uuid: UUID, at: Instant): Art
 }

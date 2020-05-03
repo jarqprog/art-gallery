@@ -1,6 +1,6 @@
 package com.jarqprog.artapi.command.domain.artfactory
 
-import com.jarqprog.artapi.command.domain.ANY_UUID
+import com.jarqprog.artapi.command.domain.commandprocessing.ANY_UUID
 import com.jarqprog.artapi.command.domain.Art
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -17,6 +17,7 @@ internal class InitialState {
         val initialState = Art.initialState(ANY_UUID)
 
         assertEquals(ANY_UUID, initialState.uuid())
+        assertEquals(ANY_UUID, initialState.uuid())
     }
 
     @Test
@@ -27,6 +28,7 @@ internal class InitialState {
         val initialState = Art.initialState(ANY_UUID)
 
         assertEquals(expectedVersion, initialState.version())
+        assertEquals(ANY_UUID, initialState.uuid())
     }
 
     @Test

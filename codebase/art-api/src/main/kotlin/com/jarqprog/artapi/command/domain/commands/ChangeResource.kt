@@ -1,15 +1,16 @@
 package com.jarqprog.artapi.command.domain.commands
 
+import com.jarqprog.artapi.command.domain.vo.Resource
 import java.util.*
 
-class ChangeResourceUrl(
+class ChangeResource(
 
         artUuid: UUID,
         version: Int,
-        private val newResourceUrl: String
+        private val resource: Resource
 
 ): ArtCommand(artUuid, version) {
 
-    fun newResourceUrl(): String = newResourceUrl
+    fun resource() = resource
 
 }

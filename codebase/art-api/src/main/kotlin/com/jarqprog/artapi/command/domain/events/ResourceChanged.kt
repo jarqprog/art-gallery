@@ -1,16 +1,17 @@
 package com.jarqprog.artapi.command.domain.events
 
+import com.jarqprog.artapi.command.domain.vo.Resource
 import java.time.Instant
 import java.util.*
 
-class ResourceUrlChanged(
+class ResourceChanged(
 
         artUuid: UUID,
         version: Int,
         timestamp: Instant,
-        private val newResourceUrl: String
+        private val resource: Resource
 
 ): ArtEvent(artUuid, version, timestamp) {
 
-    fun newResourceUrl(): String = newResourceUrl
+    fun resource() = resource
 }

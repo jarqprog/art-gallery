@@ -1,5 +1,6 @@
 package com.jarqprog.artapi.command.domain.commands
 
+import java.time.Instant
 import java.util.*
 
 abstract class ArtCommand(
@@ -9,10 +10,15 @@ abstract class ArtCommand(
 
 ) {
 
-    fun artUuid(): UUID = artUuid
-    fun version(): Int = version
+    private val name: String = javaClass.simpleName
+
+    fun name() = name
+    fun artUuid() = artUuid
+    fun version() = version
 
     override fun toString(): String {
-        return "ArtCommand(artUuid=$artUuid, version=$version)"
+        return "ArtCommand(artUuid=$artUuid, version=$version, name='$name')"
     }
+
+
 }

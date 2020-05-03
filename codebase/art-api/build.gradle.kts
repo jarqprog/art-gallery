@@ -19,6 +19,8 @@ dependencies {
 	implementation("com.github.davidmoten:rxjava2-jdbc:0.2.7")
 	implementation("org.postgresql:postgresql:42.2.12")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3")
+	implementation("io.arrow-kt:arrow-core:0.10.5")
+	implementation("io.vavr:vavr-kotlin:0.10.2")
 	runtimeOnly("org.postgresql:postgresql")
 	testImplementation("org.springframework.boot:spring-boot-starter-test") {
 		exclude(group = "org.junit.vintage", module = "junit-vintage-engine")

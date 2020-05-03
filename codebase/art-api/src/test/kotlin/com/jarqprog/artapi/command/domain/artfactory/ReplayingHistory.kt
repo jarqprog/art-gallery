@@ -11,64 +11,35 @@ internal class ReplayingHistory {
     @DisplayName("replay state from history with one event")
     fun replayHistoryWithOneEvent() {
 
-        val expected = Art(
-                EVENT_ART_CREATED.artUuid(),
-                EVENT_ART_CREATED.version(),
-                EVENT_ART_CREATED.author(),
-                EVENT_ART_CREATED.resourceUrl(),
-                ONE_EVENT_HISTORY
-        )
+        val replayed = Art.replayAll(ANY_UUID, HISTORY_WITH_ONE_EVENT)
 
-        val replayed = Art.replayAll(ANY_UUID, ONE_EVENT_HISTORY)
-
-        assertStatesEquals(expected, replayed)
+        assertStatesEquals(EXPECTED_STATE_VERSION_0, replayed)
     }
 
     @Test
     @DisplayName("replay state from history with two events")
     fun replayHistoryWithTwoEvent() {
-        val expected = Art(
-                EVENT_RESOURCE_URL_CHANGED_V1.artUuid(),
-                EVENT_RESOURCE_URL_CHANGED_V1.version(),
-                EVENT_ART_CREATED.author(),
-                EVENT_RESOURCE_URL_CHANGED_V1.newResourceUrl(),
-                TWO_EVENTS_HISTORY
-        )
 
-        val replayed = Art.replayAll(ANY_UUID, TWO_EVENTS_HISTORY)
+        val replayed = Art.replayAll(ANY_UUID, HISTORY_WITH_TWO_EVENTS)
 
-        assertStatesEquals(expected, replayed)
+        assertStatesEquals(EXPECTED_STATE_VERSION_1, replayed)
     }
 
     @Test
     @DisplayName("replay state from history with three events")
     fun replayHistoryWithThreeEvents() {
-        val expected = Art(
-                EVENT_RESOURCE_URL_CHANGED_V2.artUuid(),
-                EVENT_RESOURCE_URL_CHANGED_V2.version(),
-                EVENT_ART_CREATED.author(),
-                EVENT_RESOURCE_URL_CHANGED_V2.newResourceUrl(),
-                THREE_EVENTS_HISTORY
-        )
 
-        val replayed = Art.replayAll(ANY_UUID, THREE_EVENTS_HISTORY)
+        val replayed = Art.replayAll(ANY_UUID, HISTORY_WITH_THREE_EVENTS)
 
-        assertStatesEquals(expected, replayed)
+        assertStatesEquals(EXPECTED_STATE_VERSION_2, replayed)
     }
 
     @Test
     @DisplayName("replay state from history in reversed order")
     fun replayReversedHistory() {
-        val expected = Art(
-                EVENT_RESOURCE_URL_CHANGED_V2.artUuid(),
-                EVENT_RESOURCE_URL_CHANGED_V2.version(),
-                EVENT_ART_CREATED.author(),
-                EVENT_RESOURCE_URL_CHANGED_V2.newResourceUrl(),
-                THREE_EVENTS_HISTORY
-        )
 
-        val replayed = Art.replayAll(ANY_UUID, THREE_EVENTS_HISTORY.reversed())
+        val replayed = Art.replayAll(ANY_UUID, HISTORY_WITH_THREE_EVENTS.reversed())
 
-        assertStatesEquals(expected, replayed)
+        assertStatesEquals(EXPECTED_STATE_VERSION_2, replayed)
     }
 }
