@@ -1,7 +1,6 @@
-package com.jarqprog.artapi.read.api.db
+package com.jarqprog.artapi.query.storage
 
-import com.jarqprog.artapi.read.api.ReadFacade
-import com.jarqprog.artapi.write.dto.ArtDTO
+import com.jarqprog.artapi.query.api.QueryFacade
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -13,11 +12,11 @@ import kotlin.collections.ArrayList
 private val CACHE = ConcurrentHashMap<UUID, CachedArt>()
 private var isCleanInProgress =  AtomicBoolean(false)
 
-class CommentCache(
+class ArtCache(
         private val maxCacheSize: Int = 100,
         private val acceptableAgeInMinutes: Long = 2L
 
-): ReadFacade, LocalCache<UUID, String> {
+): QueryFacade, LocalCache<UUID, String> {
 
     override fun remember(uuid: UUID, optionalValue: Optional<String>) {
         CACHE[uuid] = CachedArt(optionalValue)
@@ -28,7 +27,7 @@ class CommentCache(
         return Optional.ofNullable(CACHE[uuid])
                 .filter { cachedArt -> cachedArt.isNotOlderThan(acceptableAgeInMinutes) }
                 .filter { cachedArt -> cachedArt.art.isPresent }
-                .map { cachedComment -> cachedComment.art }
+                .map { cachedArt -> cachedArt.art }
                 .orElseGet { Optional.empty() }
     }
 

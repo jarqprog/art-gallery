@@ -1,5 +1,7 @@
 package com.jarqprog.artapi.write.domain
 
+import com.jarqprog.artapi.UNDEFINED
+import com.jarqprog.artapi.UNKNOWN
 import java.time.LocalDateTime
 import java.util.*
 import java.util.stream.Collectors
@@ -10,7 +12,7 @@ class ArtModel(
         date: LocalDateTime = LocalDateTime.now(),
         archived: Boolean = false,
         metadata: MetadataModel = MetadataModel(dataUUID = uuid),
-        private val author: String = ANONYMOUS,
+        private val author: String = UNKNOWN,
         private val path: String = UNDEFINED,
         private val comments: Set<CommentModel> = emptySet()
 

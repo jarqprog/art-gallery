@@ -1,4 +1,4 @@
-package com.jarqprog.artapi.read.exceptions
+package com.jarqprog.artapi.query.exceptions
 
 import java.util.*
 

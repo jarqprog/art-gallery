@@ -1,8 +1,8 @@
-package com.jarqprog.artapi.read
+package com.jarqprog.artapi.query
 
-import com.jarqprog.artapi.read.api.*
-import com.jarqprog.artapi.read.api.db.CommentCache
-import com.jarqprog.artapi.read.api.db.CommentReadRepository
+import com.jarqprog.artapi.query.api.*
+import com.jarqprog.artapi.query.storage.ArtCache
+import com.jarqprog.artapi.query.storage.RxRepositoryWithCache
 import org.davidmoten.rx.jdbc.ConnectionProvider
 import org.davidmoten.rx.jdbc.Database
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,7 +13,7 @@ import org.springframework.core.env.Environment
 private const val DB_ENV = "spring.datasource.url"
 
 @Configuration
-class ReadModule {
+class QueryModule {
 
     @Bean
     fun readDatabase(@Autowired environment: Environment): Database {
@@ -23,9 +23,12 @@ class ReadModule {
     }
 
     @Bean
-    fun databasePlugin(@Autowired database: Database): ReadFacade {
-        val readRepository = CommentReadRepository(database)
-        val cache = CommentCache()
-        return ReadPlugin(readRepository, cache)
+    fun queryRepository(@Autowired readDatabase: Database): QueryRepository {
+        return RxRepositoryWithCache(readDatabase, ArtCache())
+    }
+
+    @Bean
+    fun queryPlugin(@Autowired queryRepository: QueryRepository): QueryFacade {
+        return QueryPlugin(queryRepository)
     }
 }
