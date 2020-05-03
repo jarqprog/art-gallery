@@ -1,10 +1,10 @@
 package com.jarqprog.artapi.write.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.jarqprog.artapi.write.domain.ANONYMOUS
+import com.jarqprog.artapi.UNKNOWN
 import com.jarqprog.artapi.write.domain.Comment
 import com.jarqprog.artapi.write.domain.CommentModel
-import com.jarqprog.artapi.write.domain.UNDEFINED
+import com.jarqprog.artapi.UNDEFINED
 import java.time.LocalDateTime
 import java.util.*
 
@@ -12,7 +12,7 @@ class CommentDTO(
         uuid: UUID = UUID.randomUUID(),
         date: LocalDateTime = LocalDateTime.now(),
         archived: Boolean = false,
-        private val author: String = ANONYMOUS,
+        private val author: String = UNKNOWN,
         private val content: String = UNDEFINED,
         private val artUUID: UUID
 

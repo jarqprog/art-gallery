@@ -23,8 +23,9 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-test") {
 		exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
 	}
+//	testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.3.72")
+//	testImplementation("org.spockframework:spock-spring:2.0-M2-groovy-3.0")
 }
-
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
