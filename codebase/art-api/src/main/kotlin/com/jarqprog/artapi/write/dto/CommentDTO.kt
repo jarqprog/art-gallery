@@ -16,7 +16,7 @@ class CommentDTO(
         private val content: String = UNDEFINED,
         private val artUUID: UUID
 
-): BaseDTO(uuid, date, archived), Comment {
+) : BaseDTO(uuid, date, archived), Comment {
 
     @JsonProperty
     override fun author() = author

@@ -12,7 +12,7 @@ class WritePlugin(
         private val artRepository: ArtRepository,
         private val artJsonRepository: ArtJsonRepository
 
-): WriteFacade {
+) : WriteFacade {
 
     override fun saveOne(art: ArtDTO) {
 

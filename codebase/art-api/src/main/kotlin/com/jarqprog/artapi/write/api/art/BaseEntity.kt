@@ -19,7 +19,7 @@ abstract class BaseEntity(
         private val archived: Boolean = false,
 
         @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
-        @JoinColumn(name="DATA_UUID")
+        @JoinColumn(name = "DATA_UUID")
         private val metadata: MetadataEntity
 ) {
 

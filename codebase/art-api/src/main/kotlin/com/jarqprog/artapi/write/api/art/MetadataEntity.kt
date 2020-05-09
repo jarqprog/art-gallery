@@ -9,7 +9,7 @@ import javax.persistence.*
 
 
 @Entity(name = "METADATA")
-class MetadataEntity (
+class MetadataEntity(
 
         @Id
         @Column(name = "UUID")
@@ -28,7 +28,7 @@ class MetadataEntity (
         @Column(name = "CLIENT_UUID")
         private val clientUUID: UUID
 
-): Metadata {
+) : Metadata {
 
     override fun uuid(): UUID = uuid
 

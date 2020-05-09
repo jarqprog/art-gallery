@@ -3,7 +3,7 @@ package com.jarqprog.artapi.write.domain
 import java.time.LocalDateTime
 import java.util.*
 
-abstract class BaseModel (
+abstract class BaseModel(
         private val uuid: UUID,
         private val date: LocalDateTime,
         private val archived: Boolean,

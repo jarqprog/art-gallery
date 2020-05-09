@@ -18,7 +18,7 @@ class QueryModule {
     @Bean
     fun readDatabase(@Autowired environment: Environment): Database {
         val connectionProvider = ConnectionProvider
-                .from(environment.getRequiredProperty(DB_ENV)+"&stringtype=unspecified")
+                .from(environment.getRequiredProperty(DB_ENV) + "&stringtype=unspecified")
         return Database.fromBlocking(connectionProvider)
     }
 
