@@ -9,7 +9,7 @@ import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.Id
 
-@Entity(name="JSON_ART")
+@Entity(name = "JSON_ART")
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType::class)
 data class ArtJson(
 

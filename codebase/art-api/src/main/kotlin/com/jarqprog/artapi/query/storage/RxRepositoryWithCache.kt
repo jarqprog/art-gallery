@@ -17,27 +17,27 @@ private val MAPPER = ObjectMapper().registerModule(JavaTimeModule())
 
 
 class RxRepositoryWithCache(private val database: Database,
-                   private val cache: LocalCache<UUID, String>): QueryRepository {
+                            private val cache: LocalCache<UUID, String>) : QueryRepository {
 
     override fun findByUuid(uuid: UUID): Optional<String> = Optional.of(cache.load(uuid))
-                .filter { art -> art.isPresent }
-                .orElseGet {
-                    val art = fromDB(uuid)
-                    cache.remember(uuid, art)
-                    art
-                }
+            .filter { art -> art.isPresent }
+            .orElseGet {
+                val art = fromDB(uuid)
+                cache.remember(uuid, art)
+                art
+            }
 
     private fun fromDB(uuid: UUID): Optional<String> = database.select(FIND_ONE_QUERY)
-                .parameter(uuid)
-                .getAsOptional(PGobject::class.java)
-                .doOnError { ex -> DatabaseFailure(ex) }
-                .defaultIfEmpty(Optional.empty())
-                .blockingFirst()
-                .map(PGobject::getValue)
-                .map(this::asJson)
+            .parameter(uuid)
+            .getAsOptional(PGobject::class.java)
+            .doOnError { ex -> DatabaseFailure(ex) }
+            .defaultIfEmpty(Optional.empty())
+            .blockingFirst()
+            .map(PGobject::getValue)
+            .map(this::asJson)
 
     private fun asJson(rawJson: String): String {
-        val json = MAPPER.readValue(rawJson, object: TypeReference<Map<String, Any>>() {})
+        val json = MAPPER.readValue(rawJson, object : TypeReference<Map<String, Any>>() {})
         return MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(json)
     }
 }

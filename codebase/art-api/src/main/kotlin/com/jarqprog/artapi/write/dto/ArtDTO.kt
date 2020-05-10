@@ -8,7 +8,7 @@ import java.time.LocalDateTime
 import java.util.*
 import java.util.stream.Collectors
 
-class ArtDTO (
+class ArtDTO(
         uuid: UUID = UUID.randomUUID(),
         date: LocalDateTime = LocalDateTime.now(),
         archived: Boolean = false,
@@ -16,7 +16,7 @@ class ArtDTO (
         private val path: String = UNDEFINED,
         private val comments: Set<CommentDTO> = emptySet()
 
-): BaseDTO(uuid, date, archived), Art {
+) : BaseDTO(uuid, date, archived), Art {
 
     @JsonProperty
     override fun author(): String = author

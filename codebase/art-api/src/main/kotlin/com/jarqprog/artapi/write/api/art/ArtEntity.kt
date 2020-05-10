@@ -22,7 +22,7 @@ class ArtEntity(
         private val path: String,
 
         @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
-        @JoinColumn(name="ART_UUID", referencedColumnName="UUID")
+        @JoinColumn(name = "ART_UUID", referencedColumnName = "UUID")
         private val comments: Set<CommentEntity> = mutableSetOf()
 
 ) : BaseEntity(uuid, date, archived, metadata), Art {

@@ -10,13 +10,13 @@ import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.collections.ArrayList
 
 private val CACHE = ConcurrentHashMap<UUID, CachedArt>()
-private var isCleanInProgress =  AtomicBoolean(false)
+private var isCleanInProgress = AtomicBoolean(false)
 
 class ArtCache(
         private val maxCacheSize: Int = 100,
         private val acceptableAgeInMinutes: Long = 2L
 
-): QueryFacade, LocalCache<UUID, String> {
+) : QueryFacade, LocalCache<UUID, String> {
 
     override fun remember(uuid: UUID, optionalValue: Optional<String>) {
         CACHE[uuid] = CachedArt(optionalValue)
@@ -43,7 +43,7 @@ class ArtCache(
             launch(Dispatchers.Default) {
                 isCleanInProgress.set(true)
                 val toRemove = ArrayList<UUID>()
-                CACHE.forEach { (uuid,art) -> if (art.isOlderThan(acceptableAgeInMinutes)) toRemove.add(uuid) }
+                CACHE.forEach { (uuid, art) -> if (art.isOlderThan(acceptableAgeInMinutes)) toRemove.add(uuid) }
                 toRemove.forEach { uuid -> CACHE.remove(uuid) }
                 isCleanInProgress.set(false)
             }

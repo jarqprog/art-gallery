@@ -13,7 +13,7 @@ class MetadataModel(
         private val info: String = EMPTY,
         private val clientUUID: UUID = FAKE_CLIENT
 
-): Metadata {
+) : Metadata {
 
     override fun uuid(): UUID = uuid
 

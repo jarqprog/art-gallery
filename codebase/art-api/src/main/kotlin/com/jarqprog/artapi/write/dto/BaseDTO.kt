@@ -6,9 +6,9 @@ import java.io.Serializable
 import java.time.LocalDateTime
 import java.util.*
 
-abstract class BaseDTO (private val uuid: UUID = UUID.randomUUID(),
-                        private val date: LocalDateTime = LocalDateTime.now(),
-                        private val archived: Boolean = false): Serializable {
+abstract class BaseDTO(private val uuid: UUID = UUID.randomUUID(),
+                       private val date: LocalDateTime = LocalDateTime.now(),
+                       private val archived: Boolean = false) : Serializable {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
