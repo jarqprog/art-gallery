@@ -1,6 +1,12 @@
 package com.jarqprog.artapi.command.artdomain.artfactory
 
-import com.jarqprog.artapi.command.artdomain.Art
+import com.jarqprog.artapi.command.artdomain.*
+import com.jarqprog.artapi.command.ANY_IDENTIFIER
+import com.jarqprog.artapi.command.EXPECTED_STATE_VERSION_2
+import com.jarqprog.artapi.command.HISTORY_WITH_ONE_EVENT
+import com.jarqprog.artapi.command.HISTORY_WITH_THREE_EVENTS
+import com.jarqprog.artapi.command.HISTORY_WITH_TWO_EVENTS
+import com.jarqprog.artapi.command.assertStatesEquals
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 

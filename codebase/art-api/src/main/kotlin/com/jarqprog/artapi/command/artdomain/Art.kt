@@ -11,11 +11,13 @@ import com.jarqprog.artapi.command.artdomain.vo.Author
 import com.jarqprog.artapi.command.artdomain.vo.Identifier
 import com.jarqprog.artapi.command.artdomain.vo.Resource
 import com.jarqprog.artapi.command.artdomain.vo.User
+import java.time.Instant
 
 class Art(
 
         private val identifier: Identifier,
         private val version: Int,
+        private val timestamp: Instant,
         private val author: Author,
         private val resource: Resource,
         private val addedBy: User,
@@ -88,14 +90,14 @@ class Art(
         fun replayAll(identifier: Identifier, events: List<ArtEvent>): Art {
             val initialState = initialState(identifier)
             return events
-                    .sortedWith(compareBy(ArtEvent::version))
+                    .sortedWith(compareBy(ArtEvent::timestamp))
                     .fold(initialState) { art, event -> art.applyEvent(event) }
         }
 
         fun replayFromSnapshot(snapshot: Art, events: List<ArtEvent>): Art {
             return events
-                    .filter { event -> event.version() > snapshot.version }
-                    .sortedWith(compareBy(ArtEvent::version))
+                    .filter { event -> event.timestamp() > snapshot. }
+                    .sortedWith(compareBy(ArtEvent::timestamp))
                     .toList()
                     .fold(snapshot) { art, event -> art.applyEvent(event) }
         }

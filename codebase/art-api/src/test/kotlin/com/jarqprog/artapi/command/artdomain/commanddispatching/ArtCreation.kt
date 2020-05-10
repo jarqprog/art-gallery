@@ -1,6 +1,8 @@
 package com.jarqprog.artapi.command.artdomain.commanddispatching
 
 import arrow.core.getOrElse
+import com.jarqprog.artapi.command.EVENT_ART_CREATED
+import com.jarqprog.artapi.command.HISTORY_WITHOUT_EVENTS
 import com.jarqprog.artapi.command.artdomain.*
 import com.jarqprog.artapi.command.artdomain.commands.CreateArt
 import com.jarqprog.artapi.command.artdomain.events.ArtCreated

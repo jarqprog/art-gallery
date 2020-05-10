@@ -26,6 +26,8 @@ data class EventDescriptor(
         val payload: String
 ) {
 
+    fun isNotLaterThan(stateAt: Instant) = timestamp <= stateAt
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is EventDescriptor) return false

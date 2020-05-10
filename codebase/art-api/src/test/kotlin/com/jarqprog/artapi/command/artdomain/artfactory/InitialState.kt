@@ -1,5 +1,6 @@
 package com.jarqprog.artapi.command.artdomain.artfactory
 
+import com.jarqprog.artapi.command.ANY_IDENTIFIER
 import com.jarqprog.artapi.command.artdomain.Art
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue

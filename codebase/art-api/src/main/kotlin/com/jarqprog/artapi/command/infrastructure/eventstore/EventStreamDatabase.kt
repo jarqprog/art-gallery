@@ -5,9 +5,9 @@ import com.jarqprog.artapi.command.artdomain.vo.Identifier
 import com.jarqprog.artapi.command.infrastructure.eventstore.entity.EventStream
 import java.util.*
 
-interface Database {
+interface EventStreamDatabase {
 
-    fun existsById(artId: Identifier): Boolean
+    fun historyExistsById(artId: Identifier): Boolean
     fun streamVersion(artEvent: ArtEvent): Optional<Int>
     fun save(eventStream: EventStream)
     fun load(artId: Identifier): Optional<EventStream>

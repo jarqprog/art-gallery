@@ -1,9 +1,10 @@
-package com.jarqprog.artapi.command.artdomain.artfactory
+package com.jarqprog.artapi.command
 
 import com.jarqprog.artapi.command.artdomain.Art
 import com.jarqprog.artapi.command.artdomain.ArtGenre
 import com.jarqprog.artapi.command.artdomain.ArtStatus
 import com.jarqprog.artapi.command.artdomain.events.ArtCreated
+import com.jarqprog.artapi.command.artdomain.events.ArtEvent
 import com.jarqprog.artapi.command.artdomain.events.ResourceChanged
 import com.jarqprog.artapi.command.artdomain.vo.Author
 import com.jarqprog.artapi.command.artdomain.vo.Identifier
@@ -15,6 +16,8 @@ import org.junit.jupiter.api.assertAll
 import java.time.Instant
 
 internal val ANY_IDENTIFIER: Identifier = Identifier("2aa41ef2-11cc-427f-aa7a-98158b9435fd")
+internal val ANY_OTHER_IDENTIFIER: Identifier = Identifier("2aa41ef2-11cc-427f-aa7a-98158b94356a")
+internal val NOT_USED_HISTORY_ID: Identifier = Identifier("2aa41ef2-11cc-427f-aa7a-98158b9435BB")
 internal val TIME_NOW: Instant = Instant.now()
 internal val USER_MARIA: User = User("maria_maria")
 internal val AUTHOR_MARIA: Author = Author("Maria Gonzales", USER_MARIA)
@@ -48,6 +51,7 @@ internal val EVENT_RESOURCE_URL_CHANGED_V2 = ResourceChanged(
         ANY_OTHER_RESOURCE
 )
 
+internal val HISTORY_WITHOUT_EVENTS = emptyList<ArtEvent>()
 internal val HISTORY_WITH_ONE_EVENT = listOf(EVENT_ART_CREATED)
 internal val HISTORY_WITH_TWO_EVENTS = listOf(EVENT_ART_CREATED, EVENT_RESOURCE_URL_CHANGED_V1)
 internal val HISTORY_WITH_THREE_EVENTS = listOf(EVENT_ART_CREATED, EVENT_RESOURCE_URL_CHANGED_V1, EVENT_RESOURCE_URL_CHANGED_V2)
