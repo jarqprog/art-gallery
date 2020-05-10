@@ -59,6 +59,7 @@ internal val HISTORY_WITH_THREE_EVENTS = listOf(EVENT_ART_CREATED, EVENT_RESOURC
 internal val EXPECTED_STATE_VERSION_0 = Art(
         EVENT_ART_CREATED.artId(),
         EVENT_ART_CREATED.version(),
+        EVENT_ART_CREATED.timestamp(),
         EVENT_ART_CREATED.author(),
         EVENT_ART_CREATED.resource(),
         EVENT_ART_CREATED.addedBy(),
@@ -71,6 +72,7 @@ internal val EXPECTED_STATE_VERSION_0 = Art(
 internal val EXPECTED_STATE_VERSION_1 = Art(
         EVENT_RESOURCE_URL_CHANGED_V1.artId(),
         EVENT_RESOURCE_URL_CHANGED_V1.version(),
+        EVENT_RESOURCE_URL_CHANGED_V1.timestamp(),
         EVENT_ART_CREATED.author(),
         EVENT_RESOURCE_URL_CHANGED_V1.resource(),
         EVENT_ART_CREATED.addedBy(),
@@ -82,6 +84,7 @@ internal val EXPECTED_STATE_VERSION_1 = Art(
 internal val EXPECTED_STATE_VERSION_2 = Art(
         EVENT_RESOURCE_URL_CHANGED_V2.artId(),
         EVENT_RESOURCE_URL_CHANGED_V2.version(),
+        EVENT_RESOURCE_URL_CHANGED_V2.timestamp(),
         EVENT_ART_CREATED.author(),
         EVENT_RESOURCE_URL_CHANGED_V2.resource(),
         EVENT_ART_CREATED.addedBy(),

@@ -28,6 +28,7 @@ class Art(
 
     fun identifier() = identifier
     fun version() = version
+    fun timestamp() = timestamp
     fun author() = author
     fun resource() = resource
     fun addedBy() = addedBy
@@ -47,6 +48,7 @@ class Art(
         return Art(
                 identifier,
                 event.version(),
+                event.timestamp(),
                 event.author(),
                 event.resource(),
                 event.addedBy(),
@@ -60,6 +62,7 @@ class Art(
         return Art(
                 identifier,
                 event.version(),
+                event.timestamp(),
                 author,
                 event.resource(),
                 addedBy,
@@ -78,6 +81,7 @@ class Art(
             return Art(
                     identifier,
                     -1,
+                    Instant.now(),
                     Author(),
                     Resource(UNDEFINED),
                     User(UNKNOWN),
@@ -96,7 +100,7 @@ class Art(
 
         fun replayFromSnapshot(snapshot: Art, events: List<ArtEvent>): Art {
             return events
-                    .filter { event -> event.timestamp() > snapshot. }
+                    .filter { event -> event.timestamp() > snapshot.timestamp }
                     .sortedWith(compareBy(ArtEvent::timestamp))
                     .toList()
                     .fold(snapshot) { art, event -> art.applyEvent(event) }

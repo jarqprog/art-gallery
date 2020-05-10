@@ -9,6 +9,7 @@ import com.jarqprog.artapi.command.artdomain.commands.CreateArt
 import com.jarqprog.artapi.command.artdomain.events.ArtEvent
 import com.jarqprog.artapi.command.artdomain.exceptions.CommandProcessingFailure
 import io.vavr.control.Try
+import java.util.Comparator
 
 class CommandValidator : CommandValidation {
 
@@ -27,7 +28,7 @@ class CommandValidator : CommandValidation {
         return Try.ofCallable {
             validateHistory(command, history)
             validateArtUuidEquality(command, currentState)
-            validateCommandVersionOnUpdate(command, currentState)
+            validateCommandVersionOnUpdate(command, history)
             Either.right(command)
         }
                 .onFailure { ex -> Either.left(ex) }
@@ -40,7 +41,7 @@ class CommandValidator : CommandValidation {
         return Try.ofCallable {
             validateHistory(command, events)
             validateArtUuidEquality(command, currentState)
-            validateCommandVersionOnUpdate(command, currentState)
+            validateCommandVersionOnUpdate(command, events)
             raiseFailureIf(command.resource() != currentState.resource(),
                     "resource url is the same - event not created")
             Either.right(command)
@@ -56,9 +57,14 @@ class CommandValidator : CommandValidation {
                 "invalid uuid, expected $artUuid but was: $commandArtUuid")
     }
 
-    private fun validateCommandVersionOnUpdate(command: ArtCommand, currentState: Art) {
+    private fun validateCommandVersionOnUpdate(command: ArtCommand, history: List<ArtEvent>) {
         val commandVersion = command.version()
-        val expectedVersion = currentState.version().plus(1)
+        val expectedVersion = history.stream()
+                .max(Comparator.comparing(ArtEvent::version))
+                .map(ArtEvent::version)
+                .map { version -> version.plus(1) }
+                .orElse(0)
+
         raiseFailureIf(commandVersion != expectedVersion,
                 "invalid version, expected $expectedVersion but was: $commandVersion")
     }
