@@ -7,6 +7,6 @@ import com.jarqprog.artapi.command.artdomain.exceptions.CommandProcessingFailure
 
 interface CommandDispatching {
 
-    fun dispatch(command: ArtCommand, history: List<ArtEvent>): Either<CommandProcessingFailure, ArtEvent>
+    fun dispatch(command: ArtCommand, history: ArtHistory): Either<CommandProcessingFailure, ArtEvent>
 
 }

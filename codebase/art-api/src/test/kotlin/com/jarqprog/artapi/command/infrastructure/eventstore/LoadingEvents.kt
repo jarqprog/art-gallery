@@ -39,11 +39,11 @@ internal class LoadingEvents {
     @Test
     fun shouldLoadAllHistories() {
 
-        val firstOptionalHistory = eventStore.load(HISTORY_WITH_THREE_EVENTS.first().artId())
-        val secondOptionalHistory = eventStore.load(ANOTHER_HISTORY.first().artId())
+        val firstFetchedHistory = eventStore.load(HISTORY_WITH_THREE_EVENTS.first().artId()).get()
+        val secondFetchedHistory = eventStore.load(ANOTHER_HISTORY.first().artId()).get()
 
-        assertHistoriesAreTheSame(HISTORY_WITH_THREE_EVENTS, firstOptionalHistory.get())
-        assertHistoriesAreTheSame(ANOTHER_HISTORY, secondOptionalHistory.get())
+        assertHistoryShouldMatchWithEvents(firstFetchedHistory, HISTORY_WITH_THREE_EVENTS)
+        assertHistoryShouldMatchWithEvents(secondFetchedHistory, ANOTHER_HISTORY)
     }
 
     @Test
@@ -60,8 +60,8 @@ internal class LoadingEvents {
         val firstExpectedHistory = filterHistoryByPointInTime(ANOTHER_HISTORY, firstPointInTime)
         val secondExpectedHistory = filterHistoryByPointInTime(ANOTHER_HISTORY, secondPointInTime)
 
-        assertHistoriesAreTheSame(firstExpectedHistory, firstFetchedHistory)
-        assertHistoriesAreTheSame(secondExpectedHistory, secondFetchedHistory)
+        assertHistoryShouldMatchWithEvents(firstFetchedHistory, firstExpectedHistory)
+        assertHistoryShouldMatchWithEvents(secondFetchedHistory, secondExpectedHistory)
     }
 
     @Test
@@ -109,10 +109,10 @@ internal class LoadingEvents {
         val secondExpectedHistory = filterHistoryByPointInTime(merged, ninetyDaysInTheFuture)
         val thirdExpectedHistory = filterHistoryByPointInTime(merged, hundredDaysInTheFuture)
 
-        assertHistoriesAreTheSame(firstFetchedHistory, firstExpectedHistory)
-        assertHistoriesAreTheSame(secondFetchedHistory, secondExpectedHistory)
-        assertHistoriesAreTheSame(thirdFetchedHistory, thirdExpectedHistory)
-        assertHistoriesAreTheSame(shouldBeTheSameAsSecond, secondFetchedHistory)
+        assertHistoryShouldMatchWithEvents(firstFetchedHistory, firstExpectedHistory)
+        assertHistoryShouldMatchWithEvents(secondFetchedHistory, secondExpectedHistory)
+        assertHistoryShouldMatchWithEvents(thirdFetchedHistory, thirdExpectedHistory)
+        assertHistoryShouldMatchWithEvents(shouldBeTheSameAsSecond, secondFetchedHistory.events)
     }
 
     private fun filterHistoryByPointInTime(history: List<ArtEvent>, pointInTime: Instant): List<ArtEvent> {

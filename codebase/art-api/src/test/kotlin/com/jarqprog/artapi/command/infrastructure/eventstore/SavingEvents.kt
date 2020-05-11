@@ -81,7 +81,7 @@ internal class SavingEvents {
         val optionalHistory = eventStreamDatabase.load(firstEvent.artId())
         assertTrue(optionalHistory.isPresent)
 
-        assertEventStreamShouldMatchGivenHistory(optionalHistory.get(), listOf(firstEvent, secondEvent, thirdEvent))
+        assertHistoryDescriptorShouldMatchWithEvents(optionalHistory.get(), listOf(firstEvent, secondEvent, thirdEvent))
     }
 
     @Test
@@ -104,7 +104,7 @@ internal class SavingEvents {
         val optionalHistory = eventStreamDatabase.load(firstEvent.artId())
         assertTrue(optionalHistory.isPresent)
 
-        assertEventStreamShouldMatchGivenHistory(optionalHistory.get(), listOf(firstEvent, secondEvent, thirdEvent))
+        assertHistoryDescriptorShouldMatchWithEvents(optionalHistory.get(), listOf(firstEvent, secondEvent, thirdEvent))
     }
 
     @Test
@@ -131,7 +131,7 @@ internal class SavingEvents {
                 { assertTrue(secondOptionalHistory.isPresent) }
         )
 
-        assertEventStreamShouldMatchGivenHistory(firstOptionalHistory.get(), HISTORY_WITH_THREE_EVENTS)
-        assertEventStreamShouldMatchGivenHistory(secondOptionalHistory.get(), ANOTHER_HISTORY)
+        assertHistoryDescriptorShouldMatchWithEvents(firstOptionalHistory.get(), HISTORY_WITH_THREE_EVENTS)
+        assertHistoryDescriptorShouldMatchWithEvents(secondOptionalHistory.get(), ANOTHER_HISTORY)
     }
 }

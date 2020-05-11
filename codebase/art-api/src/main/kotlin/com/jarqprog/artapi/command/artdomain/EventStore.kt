@@ -9,7 +9,7 @@ import java.util.*
 interface EventStore {
 
     fun save(event: ArtEvent): Optional<EventStoreFailure>
-    fun load(artId: Identifier): Optional<List<ArtEvent>>
-    fun load(artId: Identifier, stateAt: Instant): Optional<List<ArtEvent>>
+    fun load(artId: Identifier): Optional<ArtHistory>
+    fun load(artId: Identifier, stateAt: Instant): Optional<ArtHistory>
 
 }

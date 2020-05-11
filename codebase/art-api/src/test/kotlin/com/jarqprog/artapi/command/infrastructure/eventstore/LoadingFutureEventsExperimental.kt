@@ -1,13 +1,11 @@
 package com.jarqprog.artapi.command.infrastructure.eventstore
 
 import com.jarqprog.artapi.command.HISTORY_WITH_THREE_EVENTS
-import com.jarqprog.artapi.command.NOT_USED_HISTORY_ID
 import com.jarqprog.artapi.command.artdomain.EventStore
 import com.jarqprog.artapi.command.artdomain.events.ArtEvent
 import com.jarqprog.artapi.command.artdomain.events.ResourceChanged
 import com.jarqprog.artapi.command.artdomain.vo.Resource
 import com.jarqprog.artapi.command.infrastructure.eventstore.inmemory.InMemoryEventStreamDatabase
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Instant
@@ -74,10 +72,10 @@ internal class LoadingFutureEventsExperimental {
         val secondExpectedHistory = filterHistoryByPointInTime(merged, ninetyDaysInTheFuture)
         val thirdExpectedHistory = filterHistoryByPointInTime(merged, hundredDaysInTheFuture)
 
-        assertHistoriesAreTheSame(firstFetchedHistory, firstExpectedHistory)
-        assertHistoriesAreTheSame(secondFetchedHistory, secondExpectedHistory)
-        assertHistoriesAreTheSame(thirdFetchedHistory, thirdExpectedHistory)
-        assertHistoriesAreTheSame(shouldBeTheSameAsSecond, secondFetchedHistory)
+        assertHistoryShouldMatchWithEvents(firstFetchedHistory, firstExpectedHistory)
+        assertHistoryShouldMatchWithEvents(secondFetchedHistory, secondExpectedHistory)
+        assertHistoryShouldMatchWithEvents(thirdFetchedHistory, thirdExpectedHistory)
+        assertHistoryShouldMatchWithEvents(shouldBeTheSameAsSecond, secondFetchedHistory.events)
     }
 
     private fun filterHistoryByPointInTime(history: List<ArtEvent>, pointInTime: Instant): List<ArtEvent> {

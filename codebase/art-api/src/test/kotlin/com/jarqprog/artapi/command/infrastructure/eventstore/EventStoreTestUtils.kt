@@ -9,12 +9,13 @@ import com.jarqprog.artapi.command.AUTHOR_MARIA
 import com.jarqprog.artapi.command.TIME_NOW
 import com.jarqprog.artapi.command.USER_MARIA
 import com.jarqprog.artapi.command.artdomain.ArtGenre
+import com.jarqprog.artapi.command.artdomain.ArtHistory
 import com.jarqprog.artapi.command.artdomain.ArtStatus
 import com.jarqprog.artapi.command.artdomain.events.ArtCreated
 import com.jarqprog.artapi.command.artdomain.events.ArtEvent
 import com.jarqprog.artapi.command.artdomain.events.ResourceChanged
 import com.jarqprog.artapi.command.artdomain.vo.Identifier
-import com.jarqprog.artapi.command.infrastructure.eventstore.entity.EventStream
+import com.jarqprog.artapi.command.infrastructure.eventstore.entity.ArtHistoryDescriptor
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.assertAll
@@ -60,19 +61,46 @@ internal val ANOTHER_HISTORY = listOf(
 )
 
 
-internal fun assertEventStreamShouldMatchGivenHistory(eventStream: EventStream, eventsToCompare: List<ArtEvent>) {
+internal fun assertHistoryDescriptorShouldMatchWithEvents(historyDescriptor: ArtHistoryDescriptor,
+                                                          eventsToCompare: List<ArtEvent>) {
 
-    val sortedSerializedEvents = eventStream.events().sortedBy { event -> event.version }
+    val sortedSerializedEvents = historyDescriptor.events().sortedBy { event -> event.version }
     val sortedHistory = eventsToCompare.sortedBy { event -> event.version() }
 
-    assertAll("both history should match",
+    assertAll("both histories should match",
+            { assertEquals(historyDescriptor.artId, sortedHistory.last().artId().value) },
+            { assertEquals(historyDescriptor.version, sortedHistory.last().version()) },
+            { assertEquals(historyDescriptor.timestamp, sortedHistory.last().timestamp()) },
             { assertEquals(sortedSerializedEvents.size, sortedHistory.size) },
-            { for (index in sortedHistory.indices) {
-                assertEquals(Identifier(sortedSerializedEvents[index].artId), sortedHistory[index].artId())
-                assertEquals(sortedSerializedEvents[index].version, sortedHistory[index].version())
-                assertEquals(sortedSerializedEvents[index].eventName, sortedHistory[index].eventName())
-                assertEquals(sortedSerializedEvents[index].eventType, sortedHistory[index].eventType())
-                assertEquals(sortedSerializedEvents[index].timestamp, sortedHistory[index].timestamp())
+            {
+                for (index in sortedHistory.indices) {
+                    assertEquals(Identifier(sortedSerializedEvents[index].artId), sortedHistory[index].artId())
+                    assertEquals(sortedSerializedEvents[index].version, sortedHistory[index].version())
+                    assertEquals(sortedSerializedEvents[index].eventName, sortedHistory[index].eventName())
+                    assertEquals(sortedSerializedEvents[index].eventType, sortedHistory[index].eventType())
+                    assertEquals(sortedSerializedEvents[index].timestamp, sortedHistory[index].timestamp())
+                }
+            }
+    )
+}
+
+internal fun assertHistoryShouldMatchWithEvents(history: ArtHistory, eventsToCompare: List<ArtEvent>) {
+
+    val sortedHistory = history.events.sortedBy { event -> event.version() }
+    val sortedEvents = eventsToCompare.sortedBy { event -> event.version() }
+
+    assertAll("both histories should match",
+            { assertEquals(history.artId, sortedEvents.last().artId()) },
+            { assertEquals(history.version, sortedEvents.last().version()) },
+            { assertEquals(history.timestamp, sortedEvents.last().timestamp()) },
+            { assertEquals(sortedHistory.size, sortedEvents.size) },
+            {
+                for (index in sortedEvents.indices) {
+                    assertEquals(sortedHistory[index].artId(), sortedEvents[index].artId())
+                    assertEquals(sortedHistory[index].version(), sortedEvents[index].version())
+                    assertEquals(sortedHistory[index].timestamp(), sortedEvents[index].timestamp())
+                    assertEquals(sortedHistory[index].eventName(), sortedEvents[index].eventName())
+                    assertEquals(sortedHistory[index].eventType(), sortedEvents[index].eventType())
                 }
             }
     )
@@ -81,7 +109,7 @@ internal fun assertEventStreamShouldMatchGivenHistory(eventStream: EventStream, 
 internal fun assertHistoriesAreTheSame(firstHistory: List<ArtEvent>, secondHistory: List<ArtEvent>) {
 
     assertAll("history should be the same",
-            { assertArrayEquals(firstHistory.toTypedArray(), secondHistory.toTypedArray())}
+            { assertArrayEquals(firstHistory.toTypedArray(), secondHistory.toTypedArray()) }
     )
 }
 

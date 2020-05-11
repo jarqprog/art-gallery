@@ -2,7 +2,6 @@ package com.jarqprog.artapi.command.artdomain.commanddispatching
 
 import arrow.core.getOrElse
 import com.jarqprog.artapi.command.EVENT_ART_CREATED
-import com.jarqprog.artapi.command.HISTORY_WITHOUT_EVENTS
 import com.jarqprog.artapi.command.artdomain.*
 import com.jarqprog.artapi.command.artdomain.commands.CreateArt
 import com.jarqprog.artapi.command.artdomain.events.ArtCreated
@@ -27,7 +26,7 @@ internal class ArtCreation {
     @DisplayName("should create correct event")
     fun shouldCreateCorrectEvent() {
 
-        val optionalEvent = handler.dispatch(command, HISTORY_WITHOUT_EVENTS).toOption()
+        val optionalEvent = handler.dispatch(command, ArtHistory.initialize(command.artId)).toOption()
 
         optionalEvent
                 .map { event -> event as ArtCreated }
@@ -40,7 +39,7 @@ internal class ArtCreation {
     fun shouldCreateEventWithoutProvidingUuidAndAuthor() {
 
         val command = CreateArt(resource = EVENT_ART_CREATED.resource(), addedBy = EVENT_ART_CREATED.addedBy())
-        val optionalEvent = handler.dispatch(command, HISTORY_WITHOUT_EVENTS).toOption()
+        val optionalEvent = handler.dispatch(command, ArtHistory.initialize(command.artId)).toOption()
 
         optionalEvent
                 .map { event -> event as ArtCreated }
@@ -61,7 +60,7 @@ internal class ArtCreation {
     @DisplayName("should return command processing failure when not empty history was passed")
     fun shouldReturnExceptionOnNotEmptyHistory() {
 
-        val errorOrEvent = handler.dispatch(command, HISTORY_WITHOUT_EVENTS)
+        val errorOrEvent = handler.dispatch(command, ArtHistory.initialize(command.artId))
 
         errorOrEvent
                 .mapLeft { failure ->

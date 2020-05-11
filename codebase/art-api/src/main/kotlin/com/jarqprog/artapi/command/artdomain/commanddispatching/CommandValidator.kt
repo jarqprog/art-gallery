@@ -3,17 +3,16 @@ package com.jarqprog.artapi.command.artdomain.commanddispatching
 import arrow.core.Either
 import com.jarqprog.artapi.command.artdomain.Art
 import com.jarqprog.artapi.command.artdomain.CommandValidation
+import com.jarqprog.artapi.command.artdomain.ArtHistory
 import com.jarqprog.artapi.command.artdomain.commands.ArtCommand
 import com.jarqprog.artapi.command.artdomain.commands.ChangeResource
 import com.jarqprog.artapi.command.artdomain.commands.CreateArt
-import com.jarqprog.artapi.command.artdomain.events.ArtEvent
 import com.jarqprog.artapi.command.artdomain.exceptions.CommandProcessingFailure
 import io.vavr.control.Try
-import java.util.Comparator
 
 class CommandValidator : CommandValidation {
 
-    override fun validate(command: ArtCommand, history: List<ArtEvent>, currentState: Art):
+    override fun validate(command: ArtCommand, history: ArtHistory, currentState: Art):
             Either<CommandProcessingFailure, ArtCommand> {
         return when (command) {
             is CreateArt -> process(command, history, currentState)
@@ -22,7 +21,7 @@ class CommandValidator : CommandValidation {
         }
     }
 
-    private fun process(command: CreateArt, history: List<ArtEvent>, currentState: Art):
+    private fun process(command: CreateArt, history: ArtHistory, currentState: Art):
             Either<CommandProcessingFailure, ArtCommand> {
 
         return Try.ofCallable {
@@ -35,13 +34,13 @@ class CommandValidator : CommandValidation {
                 .get()
     }
 
-    private fun process(command: ChangeResource, events: List<ArtEvent>, currentState: Art):
+    private fun process(command: ChangeResource, history: ArtHistory, currentState: Art):
             Either<CommandProcessingFailure, ArtCommand> {
 
         return Try.ofCallable {
-            validateHistory(command, events)
+            validateHistory(command, history)
             validateArtUuidEquality(command, currentState)
-            validateCommandVersionOnUpdate(command, events)
+            validateCommandVersionOnUpdate(command, history)
             raiseFailureIf(command.resource() != currentState.resource(),
                     "resource url is the same - event not created")
             Either.right(command)
@@ -57,24 +56,20 @@ class CommandValidator : CommandValidation {
                 "invalid uuid, expected $artUuid but was: $commandArtUuid")
     }
 
-    private fun validateCommandVersionOnUpdate(command: ArtCommand, history: List<ArtEvent>) {
+    private fun validateCommandVersionOnUpdate(command: ArtCommand, history: ArtHistory) {
         val commandVersion = command.version()
-        val expectedVersion = history.stream()
-                .max(Comparator.comparing(ArtEvent::version))
-                .map(ArtEvent::version)
-                .map { version -> version.plus(1) }
-                .orElse(0)
+        val expectedVersion = history.version
 
         raiseFailureIf(commandVersion != expectedVersion,
                 "invalid version, expected $expectedVersion but was: $commandVersion")
     }
 
-    private fun validateHistory(command: ArtCommand, history: List<ArtEvent>) {
+    private fun validateHistory(command: ArtCommand, history: ArtHistory) {
         when (command) {
-            is CreateArt -> raiseFailureIf(history.isNotEmpty(),
+            is CreateArt -> raiseFailureIf(history.events.isNotEmpty(),
                     "error on processing $command - history is not empty: $history")
 
-            else -> raiseFailureIf(history.isEmpty(),
+            else -> raiseFailureIf(history.events.isEmpty(),
                     "error on processing $command - history is  empty")
         }
     }
