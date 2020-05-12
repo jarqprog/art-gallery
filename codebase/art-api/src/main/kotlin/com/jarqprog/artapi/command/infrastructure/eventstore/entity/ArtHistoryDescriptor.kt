@@ -22,13 +22,11 @@ data class ArtHistoryDescriptor(
     fun events() = events
 
     fun add(event: ArtEventDescriptor): ArtHistoryDescriptor {
-        val newEvents = events.toMutableList().plus(event)
-//        newEvents.add(event)
         return ArtHistoryDescriptor(
                 artId,
                 version + 1,
                 event.timestamp,
-                newEvents
+                events.toMutableList().plus(event)
         )
     }
 }

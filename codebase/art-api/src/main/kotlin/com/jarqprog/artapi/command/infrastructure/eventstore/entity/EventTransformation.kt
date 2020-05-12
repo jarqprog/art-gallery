@@ -11,7 +11,7 @@ import com.jarqprog.artapi.command.infrastructure.eventstore.exceptions.EventSto
 import java.util.*
 import java.util.function.Function
 
-internal val MAPPER = jacksonObjectMapper()
+private val MAPPER = jacksonObjectMapper()
         .registerModule(JavaTimeModule())
         .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
 

@@ -1,5 +1,6 @@
 package com.jarqprog.artapi.command.infrastructure.eventstore.entity
 
+
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType
 import org.hibernate.annotations.Type
 import org.hibernate.annotations.TypeDef
@@ -8,6 +9,7 @@ import java.util.*
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.Id
+
 
 @Entity(name = "ART_EVENT")
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType::class)
