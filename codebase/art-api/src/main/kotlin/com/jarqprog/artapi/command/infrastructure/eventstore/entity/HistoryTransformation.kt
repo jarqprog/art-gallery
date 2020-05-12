@@ -12,12 +12,10 @@ class HistoryTransformation : Function<ArtHistoryDescriptor, ArtHistory> {
     override fun apply(historyDescriptor: ArtHistoryDescriptor): ArtHistory {
         return ArtHistory(
                 Identifier(historyDescriptor.artId),
-                historyDescriptor.version,
-                historyDescriptor.timestamp,
                 historyDescriptor.events()
                         .stream()
-                .map(descriptorToEvent)
-                .collect(Collectors.toList())
+                        .map(descriptorToEvent)
+                        .collect(Collectors.toList())
         )
     }
 }

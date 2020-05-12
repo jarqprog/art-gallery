@@ -24,16 +24,6 @@ internal class ReplayingFromSnapshot {
     }
 
     @Test
-    @DisplayName("replay state from snapshot v0 and three events history reversed")
-    fun replayFromSnapshotV0AndThreeEventsReversed() {
-
-        val snapshot = Art.replayAll(ANY_IDENTIFIER, HISTORY_WITH_ONE_EVENT)
-        val replayed = Art.replayFromSnapshot(snapshot, HISTORY_WITH_THREE_EVENTS.reversed())
-
-        assertStatesEquals(EXPECTED_STATE_VERSION_2, replayed)
-    }
-
-    @Test
     @DisplayName("replay state from snapshot v0 and one events history")
     fun replayFromSnapshotV0AndOneEvent() {
 

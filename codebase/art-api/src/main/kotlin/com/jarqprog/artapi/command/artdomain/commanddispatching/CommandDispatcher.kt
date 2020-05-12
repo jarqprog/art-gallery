@@ -46,7 +46,7 @@ class CommandDispatcher(private val validation: CommandValidation) : CommandDisp
     private fun process(command: ChangeResource, history: ArtHistory): Either<CommandProcessingFailure, ArtEvent> {
 
         val uuid = command.artId()
-        val currentState = Art.replayAll(uuid, history.events)
+        val currentState = Art.replayAll(uuid, history)
         return validation.validate(command, history, currentState)
                 .map {
                     ResourceChanged(

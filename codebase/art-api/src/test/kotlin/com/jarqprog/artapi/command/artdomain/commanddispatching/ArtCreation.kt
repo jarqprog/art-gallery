@@ -1,6 +1,5 @@
 package com.jarqprog.artapi.command.artdomain.commanddispatching
 
-import arrow.core.getOrElse
 import com.jarqprog.artapi.command.EVENT_ART_CREATED
 import com.jarqprog.artapi.command.artdomain.*
 import com.jarqprog.artapi.command.artdomain.commands.CreateArt
@@ -23,24 +22,23 @@ internal class ArtCreation {
     )
 
     @Test
-    @DisplayName("should create correct event")
     fun shouldCreateCorrectEvent() {
 
         val optionalEvent = handler.dispatch(command, ArtHistory.initialize(command.artId)).toOption()
 
+        assertTrue(optionalEvent.nonEmpty())
         optionalEvent
                 .map { event -> event as ArtCreated }
                 .map { event -> assertArtCreatedEventsEquals(EVENT_ART_CREATED, event) }
-                .getOrElse { fail() }
     }
 
     @Test
-    @DisplayName("should create event without passing uuid and author")
     fun shouldCreateEventWithoutProvidingUuidAndAuthor() {
 
         val command = CreateArt(resource = EVENT_ART_CREATED.resource(), addedBy = EVENT_ART_CREATED.addedBy())
         val optionalEvent = handler.dispatch(command, ArtHistory.initialize(command.artId)).toOption()
 
+        assertTrue(optionalEvent.nonEmpty())
         optionalEvent
                 .map { event -> event as ArtCreated }
                 .map { event ->
@@ -53,19 +51,15 @@ internal class ArtCreation {
                             { assertEquals(ArtStatus.ACTIVE, event.artStatus()) }
                     )
                 }
-                .getOrElse { fail() }
     }
 
     @Test
-    @DisplayName("should return command processing failure when not empty history was passed")
     fun shouldReturnExceptionOnNotEmptyHistory() {
 
-        val errorOrEvent = handler.dispatch(command, ArtHistory.initialize(command.artId))
+        val errorOrEvent = handler.dispatch(command, ArtHistory(command.artId, listOf(EVENT_ART_CREATED)))
 
+        assertTrue(errorOrEvent.isLeft())
         errorOrEvent
-                .mapLeft { failure ->
-                    { assertEquals(CommandProcessingFailure::class.java, failure::class.java) }
-                }
-                .getOrElse { fail() }
+                .mapLeft { failure -> assertEquals(CommandProcessingFailure::class.java, failure::class.java) }
     }
 }

@@ -16,9 +16,10 @@ import com.jarqprog.artapi.command.artdomain.events.ArtEvent
 import com.jarqprog.artapi.command.artdomain.events.ResourceChanged
 import com.jarqprog.artapi.command.artdomain.vo.Identifier
 import com.jarqprog.artapi.command.infrastructure.eventstore.entity.ArtHistoryDescriptor
-import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.assertAll
+import java.time.Instant
+import java.util.stream.Collectors
 
 
 internal val ANOTHER_EVENT_ART_CREATED = ArtCreated(
@@ -53,24 +54,26 @@ internal val ANOTHER_EVENT_RESOURCE_URL_CHANGED_V3 = ResourceChanged(
         ANY_OTHER_RESOURCE
 )
 
-internal val ANOTHER_HISTORY = listOf(
-        ANOTHER_EVENT_ART_CREATED,
-        ANOTHER_EVENT_RESOURCE_URL_CHANGED_V1,
-        ANOTHER_EVENT_RESOURCE_URL_CHANGED_V2,
-        ANOTHER_EVENT_RESOURCE_URL_CHANGED_V3
+internal val ANOTHER_HISTORY = ArtHistory(
+        ANOTHER_EVENT_ART_CREATED.artId(),
+        listOf(
+                ANOTHER_EVENT_ART_CREATED,
+                ANOTHER_EVENT_RESOURCE_URL_CHANGED_V1,
+                ANOTHER_EVENT_RESOURCE_URL_CHANGED_V2,
+                ANOTHER_EVENT_RESOURCE_URL_CHANGED_V3
+        )
 )
 
-
-internal fun assertHistoryDescriptorShouldMatchWithEvents(historyDescriptor: ArtHistoryDescriptor,
+internal fun assertHistoryDescriptorShouldMatchWithEvents(firstHistory: ArtHistoryDescriptor,
                                                           eventsToCompare: List<ArtEvent>) {
 
-    val sortedSerializedEvents = historyDescriptor.events().sortedBy { event -> event.version }
-    val sortedHistory = eventsToCompare.sortedBy { event -> event.version() }
+    val sortedSerializedEvents = firstHistory.events().sortedBy { event -> event.timestamp }
+    val sortedHistory = eventsToCompare.sortedBy { event -> event.timestamp() }
 
-    assertAll("both histories should match",
-            { assertEquals(historyDescriptor.artId, sortedHistory.last().artId().value) },
-            { assertEquals(historyDescriptor.version, sortedHistory.last().version()) },
-            { assertEquals(historyDescriptor.timestamp, sortedHistory.last().timestamp()) },
+    assertAll("both histories should be equal",
+            { assertEquals(firstHistory.artId, sortedHistory.last().artId().value) },
+            { assertEquals(firstHistory.version, sortedHistory.last().version()) },
+            { assertEquals(firstHistory.timestamp, sortedHistory.last().timestamp()) },
             { assertEquals(sortedSerializedEvents.size, sortedHistory.size) },
             {
                 for (index in sortedHistory.indices) {
@@ -84,39 +87,39 @@ internal fun assertHistoryDescriptorShouldMatchWithEvents(historyDescriptor: Art
     )
 }
 
-internal fun assertHistoryShouldMatchWithEvents(history: ArtHistory, eventsToCompare: List<ArtEvent>) {
+internal fun assertHistoriesAreTheSame(firstHistory: ArtHistory, secondHistory: ArtHistory) {
 
-    val sortedHistory = history.events.sortedBy { event -> event.version() }
-    val sortedEvents = eventsToCompare.sortedBy { event -> event.version() }
+    val firstHistoryEvents = firstHistory.events()
+    val secondHistoryEvents = secondHistory.events()
 
-    assertAll("both histories should match",
-            { assertEquals(history.artId, sortedEvents.last().artId()) },
-            { assertEquals(history.version, sortedEvents.last().version()) },
-            { assertEquals(history.timestamp, sortedEvents.last().timestamp()) },
-            { assertEquals(sortedHistory.size, sortedEvents.size) },
+    assertAll("both histories should be equal",
+            { assertEquals(firstHistory.artId(), secondHistory.artId()) },
+            { assertEquals(firstHistory.version(), secondHistory.version()) },
+            { assertEquals(firstHistory.timestamp(), secondHistory.timestamp()) },
+            { assertEquals(firstHistory.size(), secondHistory.size()) },
             {
-                for (index in sortedEvents.indices) {
-                    assertEquals(sortedHistory[index].artId(), sortedEvents[index].artId())
-                    assertEquals(sortedHistory[index].version(), sortedEvents[index].version())
-                    assertEquals(sortedHistory[index].timestamp(), sortedEvents[index].timestamp())
-                    assertEquals(sortedHistory[index].eventName(), sortedEvents[index].eventName())
-                    assertEquals(sortedHistory[index].eventType(), sortedEvents[index].eventType())
+                for (index in secondHistoryEvents.indices) {
+                    assertEquals(firstHistoryEvents[index].artId(), secondHistoryEvents[index].artId())
+                    assertEquals(firstHistoryEvents[index].version(), secondHistoryEvents[index].version())
+                    assertEquals(firstHistoryEvents[index].timestamp(), secondHistoryEvents[index].timestamp())
+                    assertEquals(firstHistoryEvents[index].eventName(), secondHistoryEvents[index].eventName())
+                    assertEquals(firstHistoryEvents[index].eventType(), secondHistoryEvents[index].eventType())
                 }
             }
     )
 }
 
-internal fun assertHistoriesAreTheSame(firstHistory: List<ArtEvent>, secondHistory: List<ArtEvent>) {
-
-    assertAll("history should be the same",
-            { assertArrayEquals(firstHistory.toTypedArray(), secondHistory.toTypedArray()) }
+internal fun filterHistoryByPointInTime(history: ArtHistory, pointInTime: Instant): ArtHistory {
+    return ArtHistory(
+            history.artId(),
+            history.events().stream()
+                    .filter { event -> event.timestamp() <= pointInTime }
+                    .collect(Collectors.toList())
     )
 }
 
-internal fun mergeAndSortTwoHistories(firstHistory: List<ArtEvent>, secondHistory: List<ArtEvent>): List<ArtEvent> {
-
-    val merged = firstHistory.toMutableList()
-    merged.addAll(secondHistory)
-    return merged.sortedBy { event -> event.version() }.toList()
-
+internal fun filterEventsByPointInTime(history: List<ArtEvent>, pointInTime: Instant): List<ArtEvent> {
+    return history.stream()
+            .filter { event -> event.timestamp() <= pointInTime }
+            .collect(Collectors.toList())
 }
