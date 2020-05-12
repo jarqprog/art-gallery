@@ -1,5 +1,6 @@
 package com.jarqprog.artapi.command.infrastructure.eventstore.entity
 
+
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType
 import org.hibernate.annotations.Type
 import org.hibernate.annotations.TypeDef
@@ -9,9 +10,10 @@ import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.Id
 
+
 @Entity(name = "ART_EVENT")
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType::class)
-data class EventDescriptor(
+data class ArtEventDescriptor(
 
         @Id
         val uuid: UUID,
@@ -30,7 +32,7 @@ data class EventDescriptor(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is EventDescriptor) return false
+        if (other !is ArtEventDescriptor) return false
 
         if (uuid != other.uuid) return false
         if (artId != other.artId) return false

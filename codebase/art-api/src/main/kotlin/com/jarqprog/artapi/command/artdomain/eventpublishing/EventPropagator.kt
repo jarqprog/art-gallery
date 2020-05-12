@@ -10,6 +10,6 @@ class EventPropagator(private val artEventStorage: EventStore) : EventPublishing
 
     override fun publish(event: ArtEvent): Optional<EventProcessingFailure> {
         return artEventStorage.save(event)
-                .map{ failure -> EventProcessingFailure.fromThrowable(failure) }
+                .map { failure -> EventProcessingFailure.fromThrowable(failure) }
     }
 }

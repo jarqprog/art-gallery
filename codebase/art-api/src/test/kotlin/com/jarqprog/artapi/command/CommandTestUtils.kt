@@ -1,16 +1,12 @@
 package com.jarqprog.artapi.command
 
-import com.jarqprog.artapi.command.artdomain.Art
-import com.jarqprog.artapi.command.artdomain.ArtGenre
-import com.jarqprog.artapi.command.artdomain.ArtStatus
+import com.jarqprog.artapi.command.artdomain.*
 import com.jarqprog.artapi.command.artdomain.events.ArtCreated
-import com.jarqprog.artapi.command.artdomain.events.ArtEvent
 import com.jarqprog.artapi.command.artdomain.events.ResourceChanged
 import com.jarqprog.artapi.command.artdomain.vo.Author
 import com.jarqprog.artapi.command.artdomain.vo.Identifier
 import com.jarqprog.artapi.command.artdomain.vo.Resource
 import com.jarqprog.artapi.command.artdomain.vo.User
-import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.assertAll
 import java.time.Instant
@@ -51,12 +47,13 @@ internal val EVENT_RESOURCE_URL_CHANGED_V2 = ResourceChanged(
         ANY_OTHER_RESOURCE
 )
 
-internal val HISTORY_WITHOUT_EVENTS = emptyList<ArtEvent>()
-internal val HISTORY_WITH_ONE_EVENT = listOf(EVENT_ART_CREATED)
-internal val HISTORY_WITH_TWO_EVENTS = listOf(EVENT_ART_CREATED, EVENT_RESOURCE_URL_CHANGED_V1)
-internal val HISTORY_WITH_THREE_EVENTS = listOf(EVENT_ART_CREATED, EVENT_RESOURCE_URL_CHANGED_V1, EVENT_RESOURCE_URL_CHANGED_V2)
+internal val HISTORY_WITH_ONE_EVENT = ArtHistory(EVENT_ART_CREATED.artId(), listOf(EVENT_ART_CREATED))
+internal val HISTORY_WITH_TWO_EVENTS = ArtHistory(EVENT_ART_CREATED.artId(), listOf(EVENT_ART_CREATED,
+        EVENT_RESOURCE_URL_CHANGED_V1))
+internal val HISTORY_WITH_THREE_EVENTS = ArtHistory(EVENT_ART_CREATED.artId(), listOf(EVENT_ART_CREATED,
+        EVENT_RESOURCE_URL_CHANGED_V1, EVENT_RESOURCE_URL_CHANGED_V2))
 
-internal val EXPECTED_STATE_VERSION_0 = Art(
+internal val EXPECTED_STATE_VERSION_0 = TestArt(
         EVENT_ART_CREATED.artId(),
         EVENT_ART_CREATED.version(),
         EVENT_ART_CREATED.timestamp(),
@@ -64,12 +61,11 @@ internal val EXPECTED_STATE_VERSION_0 = Art(
         EVENT_ART_CREATED.resource(),
         EVENT_ART_CREATED.addedBy(),
         EVENT_ART_CREATED.artGenre(),
-        EVENT_ART_CREATED.artStatus(),
-        HISTORY_WITH_ONE_EVENT
+        EVENT_ART_CREATED.artStatus()
 )
 
 
-internal val EXPECTED_STATE_VERSION_1 = Art(
+internal val EXPECTED_STATE_VERSION_1 = TestArt(
         EVENT_RESOURCE_URL_CHANGED_V1.artId(),
         EVENT_RESOURCE_URL_CHANGED_V1.version(),
         EVENT_RESOURCE_URL_CHANGED_V1.timestamp(),
@@ -77,11 +73,10 @@ internal val EXPECTED_STATE_VERSION_1 = Art(
         EVENT_RESOURCE_URL_CHANGED_V1.resource(),
         EVENT_ART_CREATED.addedBy(),
         EVENT_ART_CREATED.artGenre(),
-        EVENT_ART_CREATED.artStatus(),
-        HISTORY_WITH_TWO_EVENTS
+        EVENT_ART_CREATED.artStatus()
 )
 
-internal val EXPECTED_STATE_VERSION_2 = Art(
+internal val EXPECTED_STATE_VERSION_2 = TestArt(
         EVENT_RESOURCE_URL_CHANGED_V2.artId(),
         EVENT_RESOURCE_URL_CHANGED_V2.version(),
         EVENT_RESOURCE_URL_CHANGED_V2.timestamp(),
@@ -89,9 +84,22 @@ internal val EXPECTED_STATE_VERSION_2 = Art(
         EVENT_RESOURCE_URL_CHANGED_V2.resource(),
         EVENT_ART_CREATED.addedBy(),
         EVENT_ART_CREATED.artGenre(),
-        EVENT_ART_CREATED.artStatus(),
-        HISTORY_WITH_THREE_EVENTS
+        EVENT_ART_CREATED.artStatus()
 )
+
+internal fun assertStatesEquals(expected: TestArt, replayed: Art) {
+
+    assertAll("art states should be equal",
+            { assertEquals(expected.identifier(), replayed.identifier()) },
+            { assertEquals(expected.version(), replayed.version()) },
+            { assertEquals(expected.timestamp(), replayed.timestamp()) },
+            { assertEquals(expected.author(), replayed.author()) },
+            { assertEquals(expected.resource(), replayed.resource()) },
+            { assertEquals(expected.addedBy(), replayed.addedBy()) },
+            { assertEquals(expected.genre(), replayed.genre()) },
+            { assertEquals(expected.status(), replayed.status()) }
+    )
+}
 
 internal fun assertStatesEquals(expected: Art, replayed: Art) {
 
@@ -103,7 +111,6 @@ internal fun assertStatesEquals(expected: Art, replayed: Art) {
             { assertEquals(expected.resource(), replayed.resource()) },
             { assertEquals(expected.addedBy(), replayed.addedBy()) },
             { assertEquals(expected.genre(), replayed.genre()) },
-            { assertEquals(expected.status(), replayed.status()) },
-            { assertArrayEquals(expected.history().toTypedArray(), replayed.history().toTypedArray()) }
+            { assertEquals(expected.status(), replayed.status()) }
     )
 }

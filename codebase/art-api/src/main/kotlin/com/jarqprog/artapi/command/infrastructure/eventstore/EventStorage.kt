@@ -1,20 +1,24 @@
 package com.jarqprog.artapi.command.infrastructure.eventstore
 
+import com.jarqprog.artapi.command.artdomain.ArtHistory
 import com.jarqprog.artapi.command.artdomain.EventStore
 import com.jarqprog.artapi.command.artdomain.events.ArtCreated
 import com.jarqprog.artapi.command.artdomain.events.ArtEvent
 import com.jarqprog.artapi.command.artdomain.vo.Identifier
-import com.jarqprog.artapi.command.infrastructure.eventstore.entity.EventStream
+import com.jarqprog.artapi.command.infrastructure.eventstore.entity.ArtHistoryDescriptor
+import com.jarqprog.artapi.command.infrastructure.eventstore.entity.EventToDescriptor
+import com.jarqprog.artapi.command.infrastructure.eventstore.entity.FilteredHistoryTransformation
+import com.jarqprog.artapi.command.infrastructure.eventstore.entity.HistoryTransformation
 import com.jarqprog.artapi.command.infrastructure.eventstore.exceptions.EventStoreFailure
 import io.vavr.control.Try
 import java.time.Instant
 import java.util.*
-import java.util.stream.Collectors
 
 class EventStorage(private val eventStreamDatabase: EventStreamDatabase) : EventStore {
 
     private val eventToDescriptor = EventToDescriptor()
-    private val descriptorToEvent = DescriptorToEvent()
+    private val historyTransformation = HistoryTransformation()
+    private val filteredHistoryTransformation = FilteredHistoryTransformation()
 
     override fun save(event: ArtEvent): Optional<EventStoreFailure> {
         return when (event) {
@@ -23,28 +27,27 @@ class EventStorage(private val eventStreamDatabase: EventStreamDatabase) : Event
         }
     }
 
-    override fun load(artId: Identifier) = load(artId, Instant.now())
-
-    override fun load(artId: Identifier, stateAt: Instant): Optional<List<ArtEvent>> {
+    override fun load(artId: Identifier): Optional<ArtHistory> {
         return eventStreamDatabase.load(artId)
-                .map(EventStream::events)
-                .map { events ->
-                        events.stream()
-                                .filter { eventDescriptor -> eventDescriptor.isNotLaterThan(stateAt) }
-                                .map(descriptorToEvent::apply)
-                                .collect(Collectors.toList())
-                }
+                .map(historyTransformation)
+    }
+
+    override fun load(artId: Identifier, stateAt: Instant): Optional<ArtHistory> {
+        return eventStreamDatabase.load(artId)
+                .map { historyDescriptor -> filteredHistoryTransformation.apply(historyDescriptor, stateAt) }
     }
 
     private fun initializeStream(event: ArtCreated): Optional<EventStoreFailure> {
         val artIdentifier = event.artId()
         val version = event.version()
+        val timestamp = event.timestamp()
         return Try.run {
             if (version != 0) throw EventStoreFailure("Incorrect version. Expected: 0 but is: $version")
             if (eventStreamDatabase.historyExistsById(artIdentifier)) throw EventStoreFailure("History already exists for art id=$artIdentifier")
-            val newEventStream = EventStream(
+            val newEventStream = ArtHistoryDescriptor(
                     artIdentifier.value,
                     version,
+                    timestamp,
                     listOf(eventToDescriptor.apply(event))
             )
             eventStreamDatabase.save(newEventStream)

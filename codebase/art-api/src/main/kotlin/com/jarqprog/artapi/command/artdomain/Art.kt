@@ -13,8 +13,7 @@ import com.jarqprog.artapi.command.artdomain.vo.Resource
 import com.jarqprog.artapi.command.artdomain.vo.User
 import java.time.Instant
 
-class Art(
-
+class Art private constructor(
         private val identifier: Identifier,
         private val version: Int,
         private val timestamp: Instant,
@@ -23,9 +22,8 @@ class Art(
         private val addedBy: User,
         private val genre: ArtGenre,
         private val status: ArtStatus,
-        private val history: List<ArtEvent>
+        private val events: List<ArtEvent>
 ) {
-
     fun identifier() = identifier
     fun version() = version
     fun timestamp() = timestamp
@@ -34,7 +32,6 @@ class Art(
     fun addedBy() = addedBy
     fun genre() = genre
     fun status() = status
-    fun history() = history
 
     private fun applyEvent(event: ArtEvent): Art {
         return when (event) {
@@ -72,8 +69,7 @@ class Art(
         )
     }
 
-    private fun appendChange(event: ArtEvent) = history.plus(event)
-
+    private fun appendChange(event: ArtEvent) = events.plus(event)
 
     companion object Factory {
 
@@ -91,17 +87,15 @@ class Art(
             )
         }
 
-        fun replayAll(identifier: Identifier, events: List<ArtEvent>): Art {
+        fun replayAll(identifier: Identifier, history: ArtHistory): Art {
             val initialState = initialState(identifier)
-            return events
-                    .sortedWith(compareBy(ArtEvent::timestamp))
+            return history.events()
                     .fold(initialState) { art, event -> art.applyEvent(event) }
         }
 
-        fun replayFromSnapshot(snapshot: Art, events: List<ArtEvent>): Art {
-            return events
+        fun replayFromSnapshot(snapshot: Art, history: ArtHistory): Art {
+            return history.events()
                     .filter { event -> event.timestamp() > snapshot.timestamp }
-                    .sortedWith(compareBy(ArtEvent::timestamp))
                     .toList()
                     .fold(snapshot) { art, event -> art.applyEvent(event) }
         }

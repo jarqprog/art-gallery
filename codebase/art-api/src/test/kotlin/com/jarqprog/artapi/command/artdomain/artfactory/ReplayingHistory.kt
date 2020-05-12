@@ -41,13 +41,4 @@ internal class ReplayingHistory {
 
         assertStatesEquals(EXPECTED_STATE_VERSION_2, replayed)
     }
-
-    @Test
-    @DisplayName("replay state from history in reversed order")
-    fun replayReversedHistory() {
-
-        val replayed = Art.replayAll(ANY_IDENTIFIER, HISTORY_WITH_THREE_EVENTS.reversed())
-
-        assertStatesEquals(EXPECTED_STATE_VERSION_2, replayed)
-    }
 }
