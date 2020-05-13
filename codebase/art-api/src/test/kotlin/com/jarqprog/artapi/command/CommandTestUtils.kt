@@ -1,12 +1,12 @@
 package com.jarqprog.artapi.command
 
-import com.jarqprog.artapi.command.artdomain.*
-import com.jarqprog.artapi.command.artdomain.events.ArtCreated
-import com.jarqprog.artapi.command.artdomain.events.ResourceChanged
-import com.jarqprog.artapi.command.artdomain.vo.Author
-import com.jarqprog.artapi.command.artdomain.vo.Identifier
-import com.jarqprog.artapi.command.artdomain.vo.Resource
-import com.jarqprog.artapi.command.artdomain.vo.User
+import com.jarqprog.artapi.command.domain.*
+import com.jarqprog.artapi.command.domain.events.ArtCreated
+import com.jarqprog.artapi.command.domain.events.ResourceChanged
+import com.jarqprog.artapi.command.domain.vo.Author
+import com.jarqprog.artapi.command.domain.vo.Identifier
+import com.jarqprog.artapi.command.domain.vo.Resource
+import com.jarqprog.artapi.command.domain.vo.User
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.assertAll
 import java.time.Instant
