@@ -9,12 +9,12 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-@RestController
-@RequestMapping("/api/art")
-class WriteEndpoints(@Autowired private val facade: WriteFacade) {
-
-    @PostMapping
-    fun save(@RequestBody art: ArtDTO) {
-        facade.saveOne(art)
-    }
-}
+//@RestController
+//@RequestMapping("/api/art")
+//class WriteEndpoints(@Autowired private val facade: WriteFacade) {
+//
+//    @PostMapping
+//    fun save(@RequestBody art: ArtDTO) {
+//        facade.saveOne(art)
+//    }
+//}

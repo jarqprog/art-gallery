@@ -74,7 +74,7 @@ class EventStorage(private val eventStreamDatabase: EventStreamDatabase) : Event
     }
 
     private fun preventConcurrentWrite(event: ArtEvent) {
-        eventStreamDatabase.streamVersion(event)
+        eventStreamDatabase.streamVersion(event.artId())
                 .ifPresent { streamVersion ->
                     if (isNotExpectedVersion(streamVersion, event))
                         throw EventStoreFailure.concurrentWrite(event)

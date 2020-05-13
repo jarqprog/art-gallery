@@ -6,10 +6,10 @@ import com.jarqprog.artapi.command.domain.events.ArtEvent
 import com.jarqprog.artapi.command.api.exceptions.EventProcessingFailure
 import java.util.*
 
-class EventPropagator(private val artEventStorage: EventStore) : EventPublishing {
+class EventPropagator(private val eventStorage: EventStore) : EventPublishing {
 
     override fun publish(event: ArtEvent): Optional<EventProcessingFailure> {
-        return artEventStorage.save(event)
+        return eventStorage.save(event)
                 .map { failure -> EventProcessingFailure.fromThrowable(failure) }
     }
 }
