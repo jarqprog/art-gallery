@@ -28,6 +28,7 @@ class ArtHistory(
     fun isEmpty() = history.isEmpty()
     fun isNotEmpty() = !isEmpty()
     fun size() = history.size
+    override fun toString() = "history for artId: $artId, version: $version, timestamp: $timestamp, size: ${size()}"
 
     companion object Factory {
         fun initialize(artId: Identifier): ArtHistory = ArtHistory(artId, emptyList())
@@ -39,10 +40,4 @@ class ArtHistory(
             else -> history.last().timestamp()
         }
     }
-
-    override fun toString(): String {
-        return "ArtHistory(artId=$artId, history=$history, version=$version, timestamp=$timestamp)"
-    }
-
-
 }

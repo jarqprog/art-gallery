@@ -23,8 +23,8 @@ class EventToDescriptor : Function<ArtEvent, ArtEventDescriptor> {
                 event.artId().value,
                 event.version(),
                 event.timestamp(),
-                event.eventType(),
-                event.eventName(),
+                event.type(),
+                event.name(),
                 MAPPER.writeValueAsString(event)
         )
     }
@@ -34,7 +34,7 @@ class DescriptorToEvent : Function<ArtEventDescriptor, ArtEvent> {
 
     override fun apply(descriptor: ArtEventDescriptor): ArtEvent {
         val payload = descriptor.payload
-        return when (descriptor.eventName) {
+        return when (descriptor.name) {
             ArtCreated::class.java.simpleName -> MAPPER.readValue(payload, ArtCreated::class.java)
             ResourceChanged::class.java.simpleName -> MAPPER.readValue(payload, ResourceChanged::class.java)
             else -> raiseFailure(descriptor)
@@ -42,8 +42,6 @@ class DescriptorToEvent : Function<ArtEventDescriptor, ArtEvent> {
     }
 
     private fun raiseFailure(descriptor: ArtEventDescriptor): Nothing {
-        throw EventStoreFailure(
-                "error while retrieving data for ${descriptor.eventName}" +
-                        " uuid:${descriptor.artId} version:${descriptor.version} timestamp:${descriptor.timestamp}")
+        throw EventStoreFailure("error while retrieving data for $descriptor")
     }
 }

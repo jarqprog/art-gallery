@@ -16,7 +16,7 @@ import java.time.Instant
 
 class CommandDispatcher(private val validation: CommandValidation) : CommandDispatching {
 
-    override fun dispatch(command: ArtCommand, history: ArtHistory): Either<CommandProcessingFailure, ArtEvent> {
+    override fun dispatch(command: ArtCommand, history: ArtHistory): Either<Throwable, ArtEvent> {
 
         return when (command) {
             is CreateArt -> process(command, history)
@@ -25,7 +25,7 @@ class CommandDispatcher(private val validation: CommandValidation) : CommandDisp
         }
     }
 
-    private fun process(command: CreateArt, history: ArtHistory): Either<CommandProcessingFailure, ArtEvent> {
+    private fun process(command: CreateArt, history: ArtHistory): Either<Throwable, ArtEvent> {
 
         val initialState = Art.initialState(command.artId())
         return validation.validate(command, history, initialState)
@@ -43,7 +43,7 @@ class CommandDispatcher(private val validation: CommandValidation) : CommandDisp
                 }
     }
 
-    private fun process(command: ChangeResource, history: ArtHistory): Either<CommandProcessingFailure, ArtEvent> {
+    private fun process(command: ChangeResource, history: ArtHistory): Either<Throwable, ArtEvent> {
 
         val uuid = command.artId()
         val currentState = Art.replayAll(uuid, history)

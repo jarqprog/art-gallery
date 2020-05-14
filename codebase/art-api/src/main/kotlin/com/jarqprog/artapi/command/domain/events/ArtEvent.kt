@@ -11,19 +11,15 @@ abstract class ArtEvent(
         private val timestamp: Instant
 
 ) {
-    private val eventType: String = javaClass.superclass.simpleName
-    private val eventName: String = javaClass.simpleName
+    private val type: String = javaClass.superclass.simpleName
+    private val name: String = javaClass.simpleName
 
-    fun eventType() = eventType
-    fun eventName() = eventName
-    fun artId(): Identifier = artId
-    fun version(): Int = version
-    fun timestamp(): Instant = timestamp
-
-
-    override fun toString(): String {
-        return "ArtEvent(artId=$artId, version=$version, timestamp=$timestamp, eventType='$eventType', eventName='$eventName')"
-    }
+    fun type() = type
+    fun name() = name
+    fun artId() = artId
+    fun version() = version
+    fun timestamp() = timestamp
+    override fun toString() = "event $name, artId: $artId, version: $version, timestamp: $timestamp"
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -32,8 +28,8 @@ abstract class ArtEvent(
         if (artId != other.artId) return false
         if (version != other.version) return false
         if (timestamp != other.timestamp) return false
-        if (eventType != other.eventType) return false
-        if (eventName != other.eventName) return false
+        if (type != other.type) return false
+        if (name != other.name) return false
 
         return true
     }
@@ -42,8 +38,8 @@ abstract class ArtEvent(
         var result = artId.hashCode()
         result = 31 * result + version
         result = 31 * result + timestamp.hashCode()
-        result = 31 * result + eventType.hashCode()
-        result = 31 * result + eventName.hashCode()
+        result = 31 * result + type.hashCode()
+        result = 31 * result + name.hashCode()
         return result
     }
 }

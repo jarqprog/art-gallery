@@ -44,7 +44,7 @@ internal class ArtCreation {
                 .map { event -> event as ArtCreated }
                 .map { event ->
                     assertAll("should have proper values - provided or default",
-                            { assertEquals(EVENT_ART_CREATED.eventName(), event.eventName()) },
+                            { assertEquals(EVENT_ART_CREATED.name(), event.name()) },
                             { assertEquals(EVENT_ART_CREATED.version(), event.version()) },
                             { assertEquals(EVENT_ART_CREATED.resource(), event.resource()) },
                             { assertEquals(EVENT_ART_CREATED.addedBy(), event.addedBy()) },

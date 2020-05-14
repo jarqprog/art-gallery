@@ -20,13 +20,15 @@ data class ArtEventDescriptor(
         val artId: String,
         val version: Int,
         val timestamp: Instant,
-        val eventType: String,
-        val eventName: String,
+        val type: String,
+        val name: String,
 
         @Type(type = "jsonb")
         @Column(columnDefinition = "jsonb")
         val payload: String
 ) {
+
+    override fun toString() = "event $name, artId: $artId, version: $version, timestamp: $timestamp"
 
     fun isNotLaterThan(stateAt: Instant) = timestamp <= stateAt
 
@@ -38,8 +40,8 @@ data class ArtEventDescriptor(
         if (artId != other.artId) return false
         if (version != other.version) return false
         if (timestamp != other.timestamp) return false
-        if (eventType != other.eventType) return false
-        if (eventName != other.eventName) return false
+        if (type != other.type) return false
+        if (name != other.name) return false
         if (payload != other.payload) return false
         return true
     }
@@ -47,8 +49,8 @@ data class ArtEventDescriptor(
     override fun hashCode(): Int {
         var result = artId.hashCode()
         result = 31 * result + version
-        result = 31 * result + eventType.hashCode()
-        result = 31 * result + eventName.hashCode()
+        result = 31 * result + type.hashCode()
+        result = 31 * result + name.hashCode()
         return result
     }
 }

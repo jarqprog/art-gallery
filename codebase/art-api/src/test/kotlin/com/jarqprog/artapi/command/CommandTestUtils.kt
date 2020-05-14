@@ -90,14 +90,14 @@ internal val EXPECTED_STATE_VERSION_2 = TestArt(
 internal fun assertStatesEquals(expected: TestArt, replayed: Art) {
 
     assertAll("art states should be equal",
-            { assertEquals(expected.identifier(), replayed.identifier()) },
-            { assertEquals(expected.version(), replayed.version()) },
-            { assertEquals(expected.timestamp(), replayed.timestamp()) },
-            { assertEquals(expected.author(), replayed.author()) },
-            { assertEquals(expected.resource(), replayed.resource()) },
-            { assertEquals(expected.addedBy(), replayed.addedBy()) },
-            { assertEquals(expected.genre(), replayed.genre()) },
-            { assertEquals(expected.status(), replayed.status()) }
+            { assertEquals(expected.identifier, replayed.identifier()) },
+            { assertEquals(expected.version, replayed.version()) },
+            { assertEquals(expected.timestamp, replayed.timestamp()) },
+            { assertEquals(expected.author, replayed.author()) },
+            { assertEquals(expected.resource, replayed.resource()) },
+            { assertEquals(expected.addedBy, replayed.addedBy()) },
+            { assertEquals(expected.genre, replayed.genre()) },
+            { assertEquals(expected.status, replayed.status()) }
     )
 }
 

@@ -27,9 +27,10 @@ class CommandValidator : CommandValidation {
 
         return runBlocking {
             Either.catch {
+                raiseFailureIf(command.version() != 0, "Incorrect version for $command. " +
+                        "Expected version: 0")
                 validateHistory(command, history)
                 validateArtIdEquality(command, currentState)
-                validateCommandVersionOnUpdate(command, currentState)
                 command
             }
                     .mapLeft { failure -> failure as CommandProcessingFailure }
@@ -44,7 +45,7 @@ class CommandValidator : CommandValidation {
                 validateArtIdEquality(command, currentState)
                 validateCommandVersionOnUpdate(command, currentState)
                 raiseFailureIf(command.resource() != currentState.resource(),
-                        "resource url is the same - event not created")
+                        "resource url for $command is the same - event not created")
                 command
             }
                     .mapLeft { failure -> failure as CommandProcessingFailure }
@@ -56,7 +57,7 @@ private fun validateArtIdEquality(command: ArtCommand, currentState: Art) {
     val commandArtUuid = command.artId()
     val artUuid = currentState.identifier()
     raiseFailureIf(commandArtUuid != artUuid,
-            "invalid uuid, expected $artUuid but was: $commandArtUuid")
+            "invalid art identifier for $command, expected id: $artUuid")
 }
 
 private fun validateCommandVersionOnUpdate(command: ArtCommand, currentState: Art) {
@@ -64,16 +65,16 @@ private fun validateCommandVersionOnUpdate(command: ArtCommand, currentState: Ar
     val expectedVersion = currentState.version().plus(1)
 
     raiseFailureIf(commandVersion != expectedVersion,
-            "invalid version, expected $expectedVersion but was: $commandVersion")
+            "invalid version for $command, expected version: $expectedVersion")
 }
 
 private fun validateHistory(command: ArtCommand, history: ArtHistory) {
     when (command) {
         is CreateArt -> raiseFailureIf(history.isNotEmpty(),
-                "error on processing $command - history is not empty: $history")
+                "error on processing $command - history is not empty")
 
         else -> raiseFailureIf(history.isEmpty(),
-                "error on processing $command - history is  empty")
+                "error on processing $command - history is empty")
     }
 }
 

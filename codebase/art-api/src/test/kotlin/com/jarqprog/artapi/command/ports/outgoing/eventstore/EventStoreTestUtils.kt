@@ -79,8 +79,8 @@ internal fun assertHistoryDescriptorShouldMatchWithEvents(firstHistory: ArtHisto
                 for (index in sortedHistory.indices) {
                     assertEquals(Identifier(sortedSerializedEvents[index].artId), sortedHistory[index].artId())
                     assertEquals(sortedSerializedEvents[index].version, sortedHistory[index].version())
-                    assertEquals(sortedSerializedEvents[index].eventName, sortedHistory[index].eventName())
-                    assertEquals(sortedSerializedEvents[index].eventType, sortedHistory[index].eventType())
+                    assertEquals(sortedSerializedEvents[index].name, sortedHistory[index].name())
+                    assertEquals(sortedSerializedEvents[index].type, sortedHistory[index].type())
                     assertEquals(sortedSerializedEvents[index].timestamp, sortedHistory[index].timestamp())
                 }
             }
@@ -102,8 +102,8 @@ internal fun assertHistoriesAreTheSame(firstHistory: ArtHistory, secondHistory: 
                     assertEquals(firstHistoryEvents[index].artId(), secondHistoryEvents[index].artId())
                     assertEquals(firstHistoryEvents[index].version(), secondHistoryEvents[index].version())
                     assertEquals(firstHistoryEvents[index].timestamp(), secondHistoryEvents[index].timestamp())
-                    assertEquals(firstHistoryEvents[index].eventName(), secondHistoryEvents[index].eventName())
-                    assertEquals(firstHistoryEvents[index].eventType(), secondHistoryEvents[index].eventType())
+                    assertEquals(firstHistoryEvents[index].name(), secondHistoryEvents[index].name())
+                    assertEquals(firstHistoryEvents[index].type(), secondHistoryEvents[index].type())
                 }
             }
     )

@@ -8,6 +8,6 @@ import com.jarqprog.artapi.command.domain.ArtHistory
 
 interface CommandDispatching {
 
-    fun dispatch(command: ArtCommand, history: ArtHistory): Either<CommandProcessingFailure, ArtEvent>
+    fun dispatch(command: ArtCommand, history: ArtHistory): Either<Throwable, ArtEvent>
 
 }

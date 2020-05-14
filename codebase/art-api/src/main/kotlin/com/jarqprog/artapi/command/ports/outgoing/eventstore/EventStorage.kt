@@ -1,5 +1,7 @@
 package com.jarqprog.artapi.command.ports.outgoing.eventstore
 
+import com.jarqprog.artapi.command.api.exceptions.IncorrectVersion
+import com.jarqprog.artapi.command.api.exceptions.NotFound
 import com.jarqprog.artapi.command.domain.ArtHistory
 import com.jarqprog.artapi.command.domain.events.ArtCreated
 import com.jarqprog.artapi.command.domain.events.ArtEvent
@@ -42,7 +44,6 @@ class EventStorage(private val eventStreamDatabase: EventStreamDatabase) : Event
         val version = event.version()
         val timestamp = event.timestamp()
         return Try.run {
-            if (version != 0) throw EventStoreFailure("Incorrect version. Expected: 0 but is: $version")
             if (eventStreamDatabase.historyExistsById(artIdentifier)) throw EventStoreFailure("History already exists for art id=$artIdentifier")
             val newEventStream = ArtHistoryDescriptor(
                     artIdentifier.value,
@@ -64,7 +65,7 @@ class EventStorage(private val eventStreamDatabase: EventStreamDatabase) : Event
             eventStreamDatabase.load(event.artId())
                     .map { eventStream -> eventStream.add(eventToDescriptor.apply(event)) }
                     .map { updated -> eventStreamDatabase.save(updated) }
-                    .orElseThrow { EventStoreFailure.notFound(event.artId()) }
+                    .orElseThrow { NotFound(event.artId()) }
         }
                 .onFailure { ex -> EventStoreFailure(ex.localizedMessage, ex) }
                 .fold(
@@ -77,7 +78,7 @@ class EventStorage(private val eventStreamDatabase: EventStreamDatabase) : Event
         eventStreamDatabase.streamVersion(event.artId())
                 .ifPresent { streamVersion ->
                     if (isNotExpectedVersion(streamVersion, event))
-                        throw EventStoreFailure.concurrentWrite(event)
+                        throw IncorrectVersion.fromEvent(event)
                 }
     }
 

@@ -20,17 +20,14 @@ class CommandHandler(
 
 ) : CommandHandling {
 
-    override fun handle(command: ArtCommand): Optional<CommandProcessingFailure> {
+    override fun handle(command: ArtCommand): Optional<Throwable> {
         return eventStore.load(command.artId())
                 .or { Optional.of(ArtHistory.initialize(command.artId)) }
                 .map { history -> commandDispatching.dispatch(command, history) }
                 .flatMap { failureOrEvent ->
                     failureOrEvent
                             .map(eventPublishing::publish)
-                            .map { optionalFailure ->
-                                optionalFailure
-                                        .map { failure -> CommandProcessingFailure.fromThrowable(failure) }
-                            }.getOrHandle { failure -> Optional.of(failure) }
+                            .getOrHandle { failure -> Optional.of(failure) }
                 }
     }
 }

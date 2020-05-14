@@ -14,10 +14,5 @@ abstract class ArtCommand(
     fun name() = name
     fun artId() = artId
     fun version() = version
-
-    override fun toString(): String {
-        return "ArtCommand(artId=$artId, version=$version, name='$name')"
-    }
-
-
+    override fun toString() = "command $name, artId: $artId, version: $version"
 }

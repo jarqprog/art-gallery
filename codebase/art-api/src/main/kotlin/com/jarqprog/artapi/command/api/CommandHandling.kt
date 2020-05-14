@@ -6,6 +6,6 @@ import java.util.*
 
 interface CommandHandling {
 
-    fun handle(command: ArtCommand): Optional<CommandProcessingFailure>
+    fun handle(command: ArtCommand): Optional<Throwable>
 
 }
