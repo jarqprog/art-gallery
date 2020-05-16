@@ -1,16 +1,13 @@
-package com.jarqprog.artapi.command.ports.outgoing.eventstore.dao.inmemory
+package com.jarqprog.artapi.command.ports.outgoing.projection.dao.inmemory
 
 import com.jarqprog.artapi.domain.vo.Identifier
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.EventStreamDatabase
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.entity.ArtHistoryDescriptor
-import org.slf4j.LoggerFactory
 
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-class InMemoryEventStreamDatabase(private val memory: ConcurrentHashMap<String, ArtHistoryDescriptor>) : EventStreamDatabase {
-
-    private val logger = LoggerFactory.getLogger(javaClass)
+class InMemoryProjectionDatabase(private val memory: ConcurrentHashMap<String, ArtHistoryDescriptor>) : EventStreamDatabase {
 
     override fun historyExistsById(artId: Identifier): Boolean {
         return memory[artId.value] != null

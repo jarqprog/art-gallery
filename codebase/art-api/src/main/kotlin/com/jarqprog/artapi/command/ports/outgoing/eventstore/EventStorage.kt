@@ -15,6 +15,7 @@ import com.jarqprog.artapi.command.ports.outgoing.eventstore.exceptions.EventSto
 import io.vavr.control.Try
 
 import kotlinx.coroutines.runBlocking
+import org.slf4j.LoggerFactory
 import java.time.Instant
 import java.util.*
 
@@ -24,7 +25,10 @@ class EventStorage(private val eventStreamDatabase: EventStreamDatabase) : Event
     private val historyTransformation = HistoryTransformation()
     private val filteredHistoryTransformation = FilteredHistoryTransformation()
 
+    private val logger = LoggerFactory.getLogger(javaClass)
+
     override fun save(event: ArtEvent): Optional<EventStoreFailure> {
+        logger.info("about to save event $event")
         return when (event) {
             is ArtCreated -> initializeStream(event)
             else -> appendToStream(event)
@@ -36,6 +40,7 @@ class EventStorage(private val eventStreamDatabase: EventStreamDatabase) : Event
             Either.catch {
                 eventStreamDatabase.load(artId)
                         .map(historyTransformation)
+                        .also { logger.info("fetching history for art id: $artId") }
             }
                     .mapLeft { failure -> EventStoreFailure.fromException(failure) }
         }
@@ -46,6 +51,7 @@ class EventStorage(private val eventStreamDatabase: EventStreamDatabase) : Event
             Either.catch {
                 eventStreamDatabase.load(artId)
                         .map { historyDescriptor -> filteredHistoryTransformation.apply(historyDescriptor, stateAt) }
+                        .also { logger.info("fetching history for art id: $artId") }
             }
                     .mapLeft { failure -> EventStoreFailure.fromException(failure) }
         }
@@ -64,6 +70,7 @@ class EventStorage(private val eventStreamDatabase: EventStreamDatabase) : Event
                     listOf(eventToDescriptor.apply(event))
             )
             eventStreamDatabase.save(newEventStream)
+            logger.info("initialized event stream with event: $event")
         }
                 .fold(
                         { ex -> Optional.of(EventStoreFailure(ex.localizedMessage, ex)) },
@@ -78,6 +85,7 @@ class EventStorage(private val eventStreamDatabase: EventStreamDatabase) : Event
                     .map { eventStream -> eventStream.add(eventToDescriptor.apply(event)) }
                     .map { updated -> eventStreamDatabase.save(updated) }
                     .orElseThrow { NotFound(event.artId()) }
+            logger.info("event $event appended to stream")
         }
                 .onFailure { ex -> EventStoreFailure(ex.localizedMessage, ex) }
                 .fold(

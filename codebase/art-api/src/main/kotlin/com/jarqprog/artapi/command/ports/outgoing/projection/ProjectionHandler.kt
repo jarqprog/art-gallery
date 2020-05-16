@@ -7,6 +7,7 @@ import com.jarqprog.artapi.command.ports.outgoing.projection.dto.ArtDto
 import com.jarqprog.artapi.command.ports.outgoing.projection.entity.ArtProjection
 import com.jarqprog.artapi.command.ports.outgoing.projection.exception.ProjectionHandlingFailure
 import io.vavr.control.Try
+import org.slf4j.LoggerFactory
 
 import java.util.*
 
@@ -15,8 +16,11 @@ class ProjectionHandler(
         private val projectionDatabase: ProjectionDatabase
 ) : ProjectionHandling {
 
+    private val logger = LoggerFactory.getLogger(javaClass)
+
     override fun handle(artIdentifier: Identifier): Optional<ProjectionHandlingFailure> {
         return Try.run {
+            logger.info("about to update projection for art identifier: $artIdentifier")
             eventStore.load(artIdentifier)
                     .map { optionalHistory ->
                         optionalHistory
@@ -24,7 +28,7 @@ class ProjectionHandler(
                                 .map { art -> ArtDto.fromArt(art) }
                                 .map { dto -> ArtProjection.fromDto(dto) }
                                 .map { projection -> projectionDatabase.save(projection) }
-//                                .orElseGet { () -> ProjectionHandlingFailure("History not fetched") }
+                                .also { logger.info("updated projection for art identifier: $artIdentifier") }
                     }
         }
                 .fold(
