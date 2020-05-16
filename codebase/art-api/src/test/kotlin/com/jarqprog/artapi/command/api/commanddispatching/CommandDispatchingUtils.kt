@@ -1,7 +1,7 @@
 package com.jarqprog.artapi.command.api.commanddispatching
 
 
-import com.jarqprog.artapi.command.domain.events.ArtCreated
+import com.jarqprog.artapi.domain.events.ArtCreated
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.assertAll
 

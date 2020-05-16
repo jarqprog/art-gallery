@@ -2,12 +2,12 @@ package com.jarqprog.artapi.command.api.commandvalidation
 
 import arrow.core.Either
 
-import com.jarqprog.artapi.command.domain.Art
+import com.jarqprog.artapi.domain.Art
 import com.jarqprog.artapi.command.api.CommandValidation
-import com.jarqprog.artapi.command.domain.ArtHistory
-import com.jarqprog.artapi.command.domain.commands.ArtCommand
-import com.jarqprog.artapi.command.domain.commands.ChangeResource
-import com.jarqprog.artapi.command.domain.commands.CreateArt
+import com.jarqprog.artapi.domain.ArtHistory
+import com.jarqprog.artapi.command.api.commands.ArtCommand
+import com.jarqprog.artapi.command.api.commands.ChangeResource
+import com.jarqprog.artapi.command.api.commands.CreateArt
 import com.jarqprog.artapi.command.api.exceptions.CommandProcessingFailure
 import kotlinx.coroutines.runBlocking
 

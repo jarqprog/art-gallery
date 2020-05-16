@@ -17,14 +17,19 @@ data class ArtEventDescriptor(
 
         @Id
         val uuid: UUID,
+        @Column(updatable = false)
         val artId: String,
+        @Column(updatable = false)
         val version: Int,
+        @Column(updatable = false)
         val timestamp: Instant,
+        @Column(updatable = false)
         val type: String,
+        @Column(updatable = false)
         val name: String,
 
         @Type(type = "jsonb")
-        @Column(columnDefinition = "jsonb")
+        @Column(columnDefinition = "jsonb", updatable = false)
         val payload: String
 ) {
 

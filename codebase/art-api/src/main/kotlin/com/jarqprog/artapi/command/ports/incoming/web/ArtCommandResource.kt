@@ -1,29 +1,23 @@
 package com.jarqprog.artapi.command.ports.incoming.web
 
 import com.jarqprog.artapi.command.api.CommandHandling
-import com.jarqprog.artapi.command.api.exceptions.CommandProcessingFailure
-import com.jarqprog.artapi.command.api.exceptions.IncorrectVersion
-import com.jarqprog.artapi.command.api.exceptions.NotFound
-import com.jarqprog.artapi.command.domain.commands.CreateArt
+import com.jarqprog.artapi.command.api.commands.CreateArt
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.util.function.Function
 
 
 @RestController
 @RequestMapping("/api/art")
-class ArtCommandResource(private val commandHandling: CommandHandling) {
+class ArtCommandResource(
+        private val commandHandling: CommandHandling,
+        private val errorResponseResolving: Function<Throwable,ResponseEntity<*>>
+) {
 
     @PostMapping
     fun create(@RequestBody command: CreateArt): ResponseEntity<*> {
         return commandHandling.handle(command)
-                .map(this::resolveErrorResponse)
-                .orElseGet { ResponseEntity.accepted().build() }
+                .map(errorResponseResolving)
+                .orElse(ResponseEntity.accepted().build<String>())
     }
-
-    private fun resolveErrorResponse(throwable: Throwable) = when(throwable) {
-            is CommandProcessingFailure -> 400
-            is IncorrectVersion -> 400
-            is NotFound -> 404
-            else -> 500
-        }.let { code -> ResponseEntity.status(code).body(ErrorResponseBody(throwable.localizedMessage)) }
 }

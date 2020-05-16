@@ -1,7 +1,6 @@
 package com.jarqprog.artapi.command.api
 
-import com.jarqprog.artapi.command.domain.commands.ArtCommand
-import com.jarqprog.artapi.command.api.exceptions.CommandProcessingFailure
+import com.jarqprog.artapi.command.api.commands.ArtCommand
 import java.util.*
 
 interface CommandHandling {

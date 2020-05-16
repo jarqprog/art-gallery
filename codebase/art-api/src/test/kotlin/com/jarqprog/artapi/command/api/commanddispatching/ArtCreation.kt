@@ -2,9 +2,9 @@ package com.jarqprog.artapi.command.api.commanddispatching
 
 import com.jarqprog.artapi.command.EVENT_ART_CREATED
 import com.jarqprog.artapi.command.api.commandvalidation.CommandValidator
-import com.jarqprog.artapi.command.domain.*
-import com.jarqprog.artapi.command.domain.commands.CreateArt
-import com.jarqprog.artapi.command.domain.events.ArtCreated
+import com.jarqprog.artapi.domain.*
+import com.jarqprog.artapi.command.api.commands.CreateArt
+import com.jarqprog.artapi.domain.events.ArtCreated
 import com.jarqprog.artapi.command.api.exceptions.CommandProcessingFailure
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*

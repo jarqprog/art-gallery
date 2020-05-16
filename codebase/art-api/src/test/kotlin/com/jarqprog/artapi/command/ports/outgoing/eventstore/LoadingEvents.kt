@@ -1,10 +1,11 @@
 package com.jarqprog.artapi.command.ports.outgoing.eventstore
 
+import arrow.core.getOrHandle
 import com.jarqprog.artapi.command.HISTORY_WITH_THREE_EVENTS
 import com.jarqprog.artapi.command.NOT_USED_HISTORY_ID
-import com.jarqprog.artapi.command.ports.outgoing.EventStore
-import com.jarqprog.artapi.command.ports.outgoing.eventstore.inmemory.InMemoryEventStreamDatabase
+import com.jarqprog.artapi.command.ports.outgoing.eventstore.dao.inmemory.InMemoryEventStreamDatabase
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.concurrent.ConcurrentHashMap
@@ -25,19 +26,29 @@ internal class LoadingEvents {
     @Test
     fun shouldNotLoadNotExistingHistory() {
 
-        val shouldBeEmpty = eventStore.load(NOT_USED_HISTORY_ID)
-
-        assertTrue(shouldBeEmpty.isEmpty)
+        eventStore.load(NOT_USED_HISTORY_ID)
+                .map { shouldBeEmpty -> assertTrue(shouldBeEmpty.isEmpty) }
+                .getOrHandle { fail("has failure") }
     }
 
     @Test
     fun shouldLoadAllHistories() {
 
-        val firstFetchedHistory = eventStore.load(HISTORY_WITH_THREE_EVENTS.artId()).get()
-        val secondFetchedHistory = eventStore.load(ANOTHER_HISTORY.artId()).get()
+        eventStore.load(HISTORY_WITH_THREE_EVENTS.artId())
+                .map { optionalHistory ->
+                    optionalHistory
+                            .map { history -> assertHistoriesAreTheSame(history, HISTORY_WITH_THREE_EVENTS) }
+                            .orElseGet { fail("was empty") }
+                }
+                .getOrHandle { fail("has failure") }
 
-        assertHistoriesAreTheSame(firstFetchedHistory, HISTORY_WITH_THREE_EVENTS)
-        assertHistoriesAreTheSame(secondFetchedHistory, ANOTHER_HISTORY)
+        eventStore.load(ANOTHER_HISTORY.artId())
+                .map { optionalHistory ->
+                    optionalHistory
+                            .map { history -> assertHistoriesAreTheSame(history, ANOTHER_HISTORY) }
+                            .orElseGet { fail("was empty") }
+                }
+                .getOrHandle { fail("has failure") }
     }
 
     @Test
@@ -46,15 +57,23 @@ internal class LoadingEvents {
         val identifier = ANOTHER_HISTORY.artId()
 
         val firstPointInTime = ANOTHER_HISTORY.events().first().timestamp().plusSeconds(1)
-        val secondPointInTime = ANOTHER_HISTORY.events().last().timestamp().minusSeconds(1)
-
-        val firstFetchedHistory = eventStore.load(identifier, firstPointInTime).get()
-        val secondFetchedHistory = eventStore.load(identifier, secondPointInTime).get()
-
         val firstExpectedHistory = filterHistoryByPointInTime(ANOTHER_HISTORY, firstPointInTime)
-        val secondExpectedHistory = filterHistoryByPointInTime(ANOTHER_HISTORY, secondPointInTime)
+        eventStore.load(identifier, firstPointInTime)
+                .map { optionalHistory ->
+                    optionalHistory
+                            .map { history -> assertHistoriesAreTheSame(history, firstExpectedHistory) }
+                            .orElseGet { fail("was empty") }
+                }
+                .getOrHandle { fail("has failure") }
 
-        assertHistoriesAreTheSame(firstFetchedHistory, firstExpectedHistory)
-        assertHistoriesAreTheSame(secondFetchedHistory, secondExpectedHistory)
+        val secondPointInTime = ANOTHER_HISTORY.events().last().timestamp().minusSeconds(1)
+        val secondExpectedHistory = filterHistoryByPointInTime(ANOTHER_HISTORY, secondPointInTime)
+        eventStore.load(identifier, secondPointInTime)
+                .map { optionalHistory ->
+                    optionalHistory
+                            .map { history -> assertHistoriesAreTheSame(history, secondExpectedHistory) }
+                            .orElseGet { fail("was empty") }
+                }
+                .getOrHandle { fail("has failure") }
     }
 }

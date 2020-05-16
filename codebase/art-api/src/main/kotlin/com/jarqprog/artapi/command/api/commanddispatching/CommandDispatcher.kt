@@ -1,16 +1,16 @@
 package com.jarqprog.artapi.command.api.commanddispatching
 
 import arrow.core.Either
-import com.jarqprog.artapi.command.domain.Art
+import com.jarqprog.artapi.domain.Art
 import com.jarqprog.artapi.command.api.CommandDispatching
 import com.jarqprog.artapi.command.api.CommandValidation
-import com.jarqprog.artapi.command.domain.ArtHistory
-import com.jarqprog.artapi.command.domain.commands.ArtCommand
-import com.jarqprog.artapi.command.domain.commands.ChangeResource
-import com.jarqprog.artapi.command.domain.commands.CreateArt
-import com.jarqprog.artapi.command.domain.events.ArtCreated
-import com.jarqprog.artapi.command.domain.events.ArtEvent
-import com.jarqprog.artapi.command.domain.events.ResourceChanged
+import com.jarqprog.artapi.domain.ArtHistory
+import com.jarqprog.artapi.command.api.commands.ArtCommand
+import com.jarqprog.artapi.command.api.commands.ChangeResource
+import com.jarqprog.artapi.command.api.commands.CreateArt
+import com.jarqprog.artapi.domain.events.ArtCreated
+import com.jarqprog.artapi.domain.events.ArtEvent
+import com.jarqprog.artapi.domain.events.ResourceChanged
 import com.jarqprog.artapi.command.api.exceptions.CommandProcessingFailure
 import java.time.Instant
 

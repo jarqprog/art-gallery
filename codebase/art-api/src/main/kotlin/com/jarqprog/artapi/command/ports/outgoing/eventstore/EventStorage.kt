@@ -1,18 +1,20 @@
 package com.jarqprog.artapi.command.ports.outgoing.eventstore
 
+import arrow.core.Either
 import com.jarqprog.artapi.command.api.exceptions.IncorrectVersion
 import com.jarqprog.artapi.command.api.exceptions.NotFound
-import com.jarqprog.artapi.command.domain.ArtHistory
-import com.jarqprog.artapi.command.domain.events.ArtCreated
-import com.jarqprog.artapi.command.domain.events.ArtEvent
-import com.jarqprog.artapi.command.domain.vo.Identifier
-import com.jarqprog.artapi.command.ports.outgoing.EventStore
+import com.jarqprog.artapi.domain.ArtHistory
+import com.jarqprog.artapi.domain.events.ArtCreated
+import com.jarqprog.artapi.domain.events.ArtEvent
+import com.jarqprog.artapi.domain.vo.Identifier
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.entity.ArtHistoryDescriptor
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.entity.EventToDescriptor
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.entity.FilteredHistoryTransformation
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.entity.HistoryTransformation
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.exceptions.EventStoreFailure
 import io.vavr.control.Try
+
+import kotlinx.coroutines.runBlocking
 import java.time.Instant
 import java.util.*
 
@@ -29,14 +31,24 @@ class EventStorage(private val eventStreamDatabase: EventStreamDatabase) : Event
         }
     }
 
-    override fun load(artId: Identifier): Optional<ArtHistory> {
-        return eventStreamDatabase.load(artId)
-                .map(historyTransformation)
+    override fun load(artId: Identifier): Either<EventStoreFailure, Optional<ArtHistory>> {
+        return runBlocking {
+            Either.catch {
+                eventStreamDatabase.load(artId)
+                        .map(historyTransformation)
+            }
+                    .mapLeft { failure -> EventStoreFailure.fromException(failure) }
+        }
     }
 
-    override fun load(artId: Identifier, stateAt: Instant): Optional<ArtHistory> {
-        return eventStreamDatabase.load(artId)
-                .map { historyDescriptor -> filteredHistoryTransformation.apply(historyDescriptor, stateAt) }
+    override fun load(artId: Identifier, stateAt: Instant): Either<EventStoreFailure, Optional<ArtHistory>> {
+        return runBlocking {
+            Either.catch {
+                eventStreamDatabase.load(artId)
+                        .map { historyDescriptor -> filteredHistoryTransformation.apply(historyDescriptor, stateAt) }
+            }
+                    .mapLeft { failure -> EventStoreFailure.fromException(failure) }
+        }
     }
 
     private fun initializeStream(event: ArtCreated): Optional<EventStoreFailure> {
