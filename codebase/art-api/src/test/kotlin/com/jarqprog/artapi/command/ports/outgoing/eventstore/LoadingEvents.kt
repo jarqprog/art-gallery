@@ -1,8 +1,8 @@
 package com.jarqprog.artapi.command.ports.outgoing.eventstore
 
 import arrow.core.getOrHandle
-import com.jarqprog.artapi.command.HISTORY_WITH_THREE_EVENTS
-import com.jarqprog.artapi.command.NOT_USED_HISTORY_ID
+import com.jarqprog.artapi.domain.HISTORY_WITH_THREE_EVENTS
+import com.jarqprog.artapi.domain.NOT_USED_HISTORY_ID
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.dao.inmemory.InMemoryEventStreamDatabase
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assertions.fail

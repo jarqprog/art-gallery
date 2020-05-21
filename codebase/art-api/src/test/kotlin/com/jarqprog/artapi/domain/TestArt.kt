@@ -7,7 +7,7 @@ import com.jarqprog.artapi.domain.vo.Resource
 import com.jarqprog.artapi.domain.vo.User
 import java.time.Instant
 
-internal data class TestArt(
+internal data class TestArt (
         val identifier: Identifier,
         val version: Int,
         val timestamp: Instant,

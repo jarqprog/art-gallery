@@ -1,21 +1,19 @@
 package com.jarqprog.artapi.command.ports.outgoing.eventstore
 
 
-import com.jarqprog.artapi.command.*
-import com.jarqprog.artapi.command.ANY_OTHER_RESOURCE
-import com.jarqprog.artapi.command.ANY_RESOURCE
-import com.jarqprog.artapi.command.ANY_RESOURCE_WITH_LONG_PATH
-import com.jarqprog.artapi.command.AUTHOR_MARIA
-import com.jarqprog.artapi.command.TIME_NOW
-import com.jarqprog.artapi.command.USER_MARIA
-import com.jarqprog.artapi.domain.ArtGenre
-import com.jarqprog.artapi.domain.ArtHistory
-import com.jarqprog.artapi.domain.ArtStatus
 import com.jarqprog.artapi.domain.events.ArtCreated
 import com.jarqprog.artapi.domain.events.ArtEvent
 import com.jarqprog.artapi.domain.events.ResourceChanged
 import com.jarqprog.artapi.domain.vo.Identifier
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.entity.ArtHistoryDescriptor
+import com.jarqprog.artapi.domain.*
+import com.jarqprog.artapi.domain.ANY_OTHER_IDENTIFIER
+import com.jarqprog.artapi.domain.ANY_OTHER_RESOURCE
+import com.jarqprog.artapi.domain.ANY_RESOURCE
+import com.jarqprog.artapi.domain.ANY_RESOURCE_WITH_LONG_PATH
+import com.jarqprog.artapi.domain.AUTHOR_MARIA
+import com.jarqprog.artapi.domain.TIME_NOW
+import com.jarqprog.artapi.domain.USER_MARIA
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.assertAll
 import java.time.Instant
@@ -54,8 +52,7 @@ internal val ANOTHER_EVENT_RESOURCE_URL_CHANGED_V3 = ResourceChanged(
         ANY_OTHER_RESOURCE
 )
 
-internal val ANOTHER_HISTORY = ArtHistory(
-        ANOTHER_EVENT_ART_CREATED.artId(),
+internal val ANOTHER_HISTORY = ArtHistory.withEvents(
         listOf(
                 ANOTHER_EVENT_ART_CREATED,
                 ANOTHER_EVENT_RESOURCE_URL_CHANGED_V1,
@@ -110,8 +107,7 @@ internal fun assertHistoriesAreTheSame(firstHistory: ArtHistory, secondHistory: 
 }
 
 internal fun filterHistoryByPointInTime(history: ArtHistory, pointInTime: Instant): ArtHistory {
-    return ArtHistory(
-            history.artId(),
+    return ArtHistory.withEvents(
             history.events().stream()
                     .filter { event -> event.timestamp() <= pointInTime }
                     .collect(Collectors.toList())

@@ -1,6 +1,6 @@
 package com.jarqprog.artapi.command.api.commanddispatching
 
-import com.jarqprog.artapi.command.EVENT_ART_CREATED
+import com.jarqprog.artapi.domain.EVENT_ART_CREATED
 import com.jarqprog.artapi.command.api.commandvalidation.CommandValidator
 import com.jarqprog.artapi.domain.*
 import com.jarqprog.artapi.command.api.commands.CreateArt
@@ -57,7 +57,7 @@ internal class ArtCreation {
     @Test
     fun shouldReturnExceptionOnNotEmptyHistory() {
 
-        val errorOrEvent = handler.dispatch(command, ArtHistory(command.artId, listOf(EVENT_ART_CREATED)))
+        val errorOrEvent = handler.dispatch(command, ArtHistory.withEvents(listOf(EVENT_ART_CREATED)))
 
         assertTrue(errorOrEvent.isLeft())
         errorOrEvent

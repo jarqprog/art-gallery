@@ -13,7 +13,7 @@ import com.jarqprog.artapi.domain.vo.Resource
 import com.jarqprog.artapi.domain.vo.User
 import java.time.Instant
 
-class Art private constructor(
+class ArtAggregate private constructor(
         private val identifier: Identifier,
         private val version: Int,
         private val timestamp: Instant,
@@ -33,7 +33,7 @@ class Art private constructor(
     fun genre() = genre
     fun status() = status
 
-    private fun applyEvent(event: ArtEvent): Art {
+    private fun applyEvent(event: ArtEvent): ArtAggregate {
         return when (event) {
             is ArtCreated -> apply(event)
             is ResourceChanged -> apply(event)
@@ -41,8 +41,8 @@ class Art private constructor(
         }
     }
 
-    private fun apply(event: ArtCreated): Art {
-        return Art(
+    private fun apply(event: ArtCreated): ArtAggregate {
+        return ArtAggregate(
                 identifier,
                 event.version(),
                 event.timestamp(),
@@ -55,8 +55,8 @@ class Art private constructor(
         )
     }
 
-    private fun apply(event: ResourceChanged): Art {
-        return Art(
+    private fun apply(event: ResourceChanged): ArtAggregate {
+        return ArtAggregate(
                 identifier,
                 event.version(),
                 event.timestamp(),
@@ -73,11 +73,11 @@ class Art private constructor(
 
     companion object Factory {
 
-        fun initialState(identifier: Identifier): Art {
-            return Art(
+        fun initialState(identifier: Identifier): ArtAggregate {
+            return ArtAggregate(
                     identifier,
                     -1,
-                    Instant.now(),
+                    Instant.MIN,
                     Author(),
                     Resource(UNDEFINED),
                     User(UNKNOWN),
@@ -87,17 +87,10 @@ class Art private constructor(
             )
         }
 
-        fun replayAll(identifier: Identifier, history: ArtHistory): Art {
-            val initialState = initialState(identifier)
+        fun replayAll(history: ArtHistory): ArtAggregate {
+            val initialState = history.snapshot()
             return history.events()
                     .fold(initialState) { art, event -> art.applyEvent(event) }
-        }
-
-        fun replayFromSnapshot(snapshot: Art, history: ArtHistory): Art {
-            return history.events()
-                    .filter { event -> event.timestamp() > snapshot.timestamp }
-                    .toList()
-                    .fold(snapshot) { art, event -> art.applyEvent(event) }
         }
     }
 }

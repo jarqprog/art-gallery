@@ -1,16 +1,14 @@
-package com.jarqprog.artapi.domain.arthistory
+package com.jarqprog.artapi.domain.historyfactory
 
-import com.jarqprog.artapi.command.ANY_IDENTIFIER
-import com.jarqprog.artapi.command.HISTORY_WITH_THREE_EVENTS
+import com.jarqprog.artapi.domain.ANY_IDENTIFIER
 import com.jarqprog.artapi.domain.ArtHistory
 import com.jarqprog.artapi.domain.events.ArtEvent
-import com.jarqprog.artapi.command.ports.outgoing.eventstore.assertHistoriesAreTheSame
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import java.time.Instant
 
-internal class ArtHistoryCreation {
+internal class WithIdentifier {
 
     @Test
     fun initializedHistoryShouldHaveProperValues() {
@@ -26,21 +24,5 @@ internal class ArtHistoryCreation {
                 { assertEquals(expectedTimestamp, history.timestamp()) },
                 { assertEquals(expectedEvents, history.events()) }
         )
-    }
-
-    @Test
-    fun historyCreatedWithEventsShouldHaveProperValues() {
-
-        val history = ArtHistory(ANY_IDENTIFIER, HISTORY_WITH_THREE_EVENTS.events())
-
-        assertHistoriesAreTheSame(HISTORY_WITH_THREE_EVENTS, history)
-    }
-
-    @Test
-    fun historyCreatedWithEventsInReversedOrderShouldHaveProperValues() {
-
-        val history = ArtHistory(ANY_IDENTIFIER, HISTORY_WITH_THREE_EVENTS.events().reversed())
-
-        assertHistoriesAreTheSame(HISTORY_WITH_THREE_EVENTS, history)
     }
 }

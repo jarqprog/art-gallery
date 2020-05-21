@@ -1,10 +1,10 @@
 package com.jarqprog.artapi.command.ports.outgoing.eventstore
 
 
-import com.jarqprog.artapi.command.EVENT_ART_CREATED
-import com.jarqprog.artapi.command.EVENT_RESOURCE_URL_CHANGED_V1
-import com.jarqprog.artapi.command.EVENT_RESOURCE_URL_CHANGED_V2
-import com.jarqprog.artapi.command.HISTORY_WITH_THREE_EVENTS
+import com.jarqprog.artapi.domain.EVENT_ART_CREATED
+import com.jarqprog.artapi.domain.EVENT_RESOURCE_URL_CHANGED_V1
+import com.jarqprog.artapi.domain.EVENT_RESOURCE_URL_CHANGED_V2
+import com.jarqprog.artapi.domain.HISTORY_WITH_THREE_EVENTS
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.exceptions.EventStoreFailure
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.dao.inmemory.InMemoryEventStreamDatabase
 import org.junit.jupiter.api.Assertions.*

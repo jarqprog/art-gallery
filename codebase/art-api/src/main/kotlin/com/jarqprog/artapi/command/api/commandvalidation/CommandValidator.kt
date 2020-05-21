@@ -2,7 +2,7 @@ package com.jarqprog.artapi.command.api.commandvalidation
 
 import arrow.core.Either
 
-import com.jarqprog.artapi.domain.Art
+import com.jarqprog.artapi.domain.ArtAggregate
 import com.jarqprog.artapi.command.api.CommandValidation
 import com.jarqprog.artapi.domain.ArtHistory
 import com.jarqprog.artapi.command.api.commands.ArtCommand
@@ -13,7 +13,7 @@ import kotlinx.coroutines.runBlocking
 
 class CommandValidator : CommandValidation {
 
-    override fun validate(command: ArtCommand, history: ArtHistory, currentState: Art):
+    override fun validate(command: ArtCommand, history: ArtHistory, currentState: ArtAggregate):
             Either<CommandProcessingFailure, ArtCommand> {
         return when (command) {
             is CreateArt -> process(command, history, currentState)
@@ -22,7 +22,7 @@ class CommandValidator : CommandValidation {
         }
     }
 
-    private fun process(command: CreateArt, history: ArtHistory, currentState: Art):
+    private fun process(command: CreateArt, history: ArtHistory, currentState: ArtAggregate):
             Either<CommandProcessingFailure, ArtCommand> {
 
         return runBlocking {
@@ -37,7 +37,7 @@ class CommandValidator : CommandValidation {
         }
     }
 
-    private fun process(command: ChangeResource, history: ArtHistory, currentState: Art):
+    private fun process(command: ChangeResource, history: ArtHistory, currentState: ArtAggregate):
             Either<CommandProcessingFailure, ArtCommand> {
         return runBlocking {
             Either.catch {
@@ -53,14 +53,14 @@ class CommandValidator : CommandValidation {
     }
 }
 
-private fun validateArtIdEquality(command: ArtCommand, currentState: Art) {
+private fun validateArtIdEquality(command: ArtCommand, currentState: ArtAggregate) {
     val commandArtUuid = command.artId()
     val artUuid = currentState.identifier()
     raiseFailureIf(commandArtUuid != artUuid,
             "invalid art identifier for $command, expected id: $artUuid")
 }
 
-private fun validateCommandVersionOnUpdate(command: ArtCommand, currentState: Art) {
+private fun validateCommandVersionOnUpdate(command: ArtCommand, currentState: ArtAggregate) {
     val commandVersion = command.version()
     val expectedVersion = currentState.version().plus(1)
 

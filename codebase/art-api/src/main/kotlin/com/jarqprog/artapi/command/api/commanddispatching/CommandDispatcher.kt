@@ -1,7 +1,7 @@
 package com.jarqprog.artapi.command.api.commanddispatching
 
 import arrow.core.Either
-import com.jarqprog.artapi.domain.Art
+import com.jarqprog.artapi.domain.ArtAggregate
 import com.jarqprog.artapi.command.api.CommandDispatching
 import com.jarqprog.artapi.command.api.CommandValidation
 import com.jarqprog.artapi.domain.ArtHistory
@@ -27,7 +27,7 @@ class CommandDispatcher(private val validation: CommandValidation) : CommandDisp
 
     private fun process(command: CreateArt, history: ArtHistory): Either<Throwable, ArtEvent> {
 
-        val initialState = Art.initialState(command.artId())
+        val initialState = ArtAggregate.initialState(command.artId())
         return validation.validate(command, history, initialState)
                 .map {
                     ArtCreated(
@@ -46,7 +46,7 @@ class CommandDispatcher(private val validation: CommandValidation) : CommandDisp
     private fun process(command: ChangeResource, history: ArtHistory): Either<Throwable, ArtEvent> {
 
         val uuid = command.artId()
-        val currentState = Art.replayAll(uuid, history)
+        val currentState = ArtAggregate.replayAll(history)
         return validation.validate(command, history, currentState)
                 .map {
                     ResourceChanged(

@@ -1,7 +1,7 @@
 package com.jarqprog.artapi.command.ports.outgoing.eventstore
 
 import arrow.core.getOrHandle
-import com.jarqprog.artapi.command.HISTORY_WITH_THREE_EVENTS
+import com.jarqprog.artapi.domain.HISTORY_WITH_THREE_EVENTS
 import com.jarqprog.artapi.domain.ArtHistory
 import com.jarqprog.artapi.domain.events.ArtEvent
 import com.jarqprog.artapi.domain.events.ResourceChanged
@@ -62,7 +62,7 @@ internal class LoadingFutureEventsExperimental {
         future.forEach { event -> eventStore.save(event) }
         val merged = ANOTHER_HISTORY.events().plus(future)
 
-        val firstExpectedHistory = ArtHistory(identifier, filterEventsByPointInTime(merged, eightyDaysInTheFuture))
+        val firstExpectedHistory = ArtHistory.withEvents(filterEventsByPointInTime(merged, eightyDaysInTheFuture))
         eventStore.load(identifier, eightyDaysInTheFuture)
                 .map { optionalHistory ->
                     optionalHistory
@@ -71,7 +71,7 @@ internal class LoadingFutureEventsExperimental {
                 }
                 .getOrHandle { Assertions.fail("has failure") }
 
-        val secondExpectedHistory = ArtHistory(identifier, filterEventsByPointInTime(merged, ninetyDaysInTheFuture))
+        val secondExpectedHistory = ArtHistory.withEvents(filterEventsByPointInTime(merged, ninetyDaysInTheFuture))
         eventStore.load(identifier, ninetyDaysInTheFuture)
                 .map { optionalHistory ->
                     optionalHistory
@@ -81,7 +81,7 @@ internal class LoadingFutureEventsExperimental {
                 .getOrHandle { Assertions.fail("has failure") }
 
 
-        val thirdExpectedHistory = ArtHistory(identifier, filterEventsByPointInTime(merged, hundredDaysInTheFuture))
+        val thirdExpectedHistory = ArtHistory.withEvents(filterEventsByPointInTime(merged, hundredDaysInTheFuture))
         eventStore.load(identifier, hundredDaysInTheFuture)
                 .map { optionalHistory ->
                     optionalHistory

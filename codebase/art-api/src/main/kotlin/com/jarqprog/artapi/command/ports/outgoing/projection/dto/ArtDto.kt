@@ -1,7 +1,7 @@
 package com.jarqprog.artapi.command.ports.outgoing.projection.dto
 
 
-import com.jarqprog.artapi.domain.Art
+import com.jarqprog.artapi.domain.ArtAggregate
 import com.jarqprog.artapi.domain.ArtGenre
 import com.jarqprog.artapi.domain.ArtStatus
 import com.jarqprog.artapi.domain.vo.Author
@@ -22,7 +22,7 @@ data class ArtDto(
 
     companion object Factory {
 
-        fun fromArt(art: Art) = ArtDto(
+        fun fromArt(art: ArtAggregate) = ArtDto(
                 art.identifier().value,
                 art.version(),
                 art.timestamp(),
