@@ -6,23 +6,23 @@ import com.jarqprog.artapi.command.ports.outgoing.eventstore.entity.ArtHistoryDe
 import org.slf4j.LoggerFactory
 import java.util.*
 
-class EventStreamJDBC(private val artStreamRepository: ArtStreamRepository) : EventStreamDatabase {
+class EventStreamJDBC(private val streamRepository: HistoryRepository) : EventStreamDatabase {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
     override fun historyExistsById(artId: Identifier): Boolean {
-        return artStreamRepository.existsById(artId.value)
+        return streamRepository.existsById(artId.value)
     }
 
     override fun streamVersion(artId: Identifier): Optional<Int> {
-        return artStreamRepository.findVersionByArtId(artId.value)
+        return streamRepository.findVersionByArtId(artId.value)
     }
 
     override fun save(eventStream: ArtHistoryDescriptor) {
-        artStreamRepository.save(eventStream)
+        streamRepository.save(eventStream)
     }
 
     override fun load(artId: Identifier): Optional<ArtHistoryDescriptor> {
-        return artStreamRepository.findById(artId.value)
+        return streamRepository.findById(artId.value)
     }
 }

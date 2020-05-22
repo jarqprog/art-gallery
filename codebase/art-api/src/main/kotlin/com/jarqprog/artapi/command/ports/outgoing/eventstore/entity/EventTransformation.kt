@@ -15,7 +15,7 @@ private val MAPPER = jacksonObjectMapper()
         .registerModule(JavaTimeModule())
         .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
 
-class EventToDescriptor : Function<ArtEvent, ArtEventDescriptor> {
+class ToDescriptor : Function<ArtEvent, ArtEventDescriptor> {
 
     override fun apply(event: ArtEvent): ArtEventDescriptor {
         return ArtEventDescriptor(
@@ -30,7 +30,7 @@ class EventToDescriptor : Function<ArtEvent, ArtEventDescriptor> {
     }
 }
 
-class DescriptorToEvent : Function<ArtEventDescriptor, ArtEvent> {
+class ToEvent : Function<ArtEventDescriptor, ArtEvent> {
 
     override fun apply(descriptor: ArtEventDescriptor): ArtEvent {
         val payload = descriptor.payload

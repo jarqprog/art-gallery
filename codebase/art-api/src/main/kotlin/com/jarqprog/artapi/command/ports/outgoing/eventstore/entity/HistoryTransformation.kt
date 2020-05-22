@@ -6,7 +6,7 @@ import java.util.stream.Collectors
 
 class HistoryTransformation : Function<ArtHistoryDescriptor, ArtHistory> {
 
-    private val descriptorToEvent = DescriptorToEvent()
+    private val descriptorToEvent = ToEvent()
 
     override fun apply(historyDescriptor: ArtHistoryDescriptor): ArtHistory {
         return ArtHistory.withEvents(

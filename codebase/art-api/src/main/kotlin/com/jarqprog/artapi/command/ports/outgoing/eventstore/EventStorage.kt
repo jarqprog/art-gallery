@@ -8,7 +8,7 @@ import com.jarqprog.artapi.domain.events.ArtCreated
 import com.jarqprog.artapi.domain.events.ArtEvent
 import com.jarqprog.artapi.domain.vo.Identifier
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.entity.ArtHistoryDescriptor
-import com.jarqprog.artapi.command.ports.outgoing.eventstore.entity.EventToDescriptor
+import com.jarqprog.artapi.command.ports.outgoing.eventstore.entity.ToDescriptor
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.entity.FilteredHistoryTransformation
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.entity.HistoryTransformation
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.exceptions.EventStoreFailure
@@ -21,7 +21,7 @@ import java.util.*
 
 class EventStorage(private val eventStreamDatabase: EventStreamDatabase) : EventStore {
 
-    private val eventToDescriptor = EventToDescriptor()
+    private val eventToDescriptor = ToDescriptor()
     private val historyTransformation = HistoryTransformation()
     private val filteredHistoryTransformation = FilteredHistoryTransformation()
 

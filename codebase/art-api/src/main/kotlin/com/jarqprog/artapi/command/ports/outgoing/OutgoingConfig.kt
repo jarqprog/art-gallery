@@ -2,7 +2,7 @@ package com.jarqprog.artapi.command.ports.outgoing
 
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.EventStorage
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.EventStore
-import com.jarqprog.artapi.command.ports.outgoing.eventstore.dao.sql.ArtStreamRepository
+import com.jarqprog.artapi.command.ports.outgoing.eventstore.dao.sql.HistoryRepository
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.dao.sql.EventStreamJDBC
 import com.jarqprog.artapi.command.ports.outgoing.projection.ProjectionHandler
 import com.jarqprog.artapi.command.ports.outgoing.projection.ProjectionHandling
@@ -16,8 +16,8 @@ import org.springframework.context.annotation.Configuration
 class OutgoingConfig {
 
     @Bean
-    fun eventStore(@Autowired artStreamRepository: ArtStreamRepository): EventStore {
-        return EventStorage(EventStreamJDBC(artStreamRepository))
+    fun eventStore(@Autowired streamRepository: HistoryRepository): EventStore {
+        return EventStorage(EventStreamJDBC(streamRepository))
     }
 
     @Bean

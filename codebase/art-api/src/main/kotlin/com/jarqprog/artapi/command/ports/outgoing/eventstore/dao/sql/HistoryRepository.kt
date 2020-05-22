@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository
 import java.util.*
 
 @Repository
-interface ArtStreamRepository : CrudRepository<ArtHistoryDescriptor, String> {
+interface HistoryRepository : CrudRepository<ArtHistoryDescriptor, String> {
 
     fun findVersionByArtId(artId: String): Optional<Int>
 

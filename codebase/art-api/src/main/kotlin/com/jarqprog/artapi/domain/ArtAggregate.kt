@@ -21,8 +21,7 @@ class ArtAggregate private constructor(
         private val resource: Resource,
         private val addedBy: User,
         private val genre: ArtGenre,
-        private val status: ArtStatus,
-        private val events: List<ArtEvent>
+        private val status: ArtStatus
 ) {
     fun identifier() = identifier
     fun version() = version
@@ -50,8 +49,7 @@ class ArtAggregate private constructor(
                 event.resource(),
                 event.addedBy(),
                 event.artGenre(),
-                event.artStatus(),
-                appendChange(event)
+                event.artStatus()
         )
     }
 
@@ -64,12 +62,13 @@ class ArtAggregate private constructor(
                 event.resource(),
                 addedBy,
                 genre,
-                status,
-                appendChange(event)
+                status
         )
     }
 
-    private fun appendChange(event: ArtEvent) = events.plus(event)
+    override fun toString(): String {
+        return "ArtAggregate(identifier=$identifier, version=$version, timestamp=$timestamp, author=$author, resource=$resource, addedBy=$addedBy, genre=$genre, status=$status)"
+    }
 
     companion object Factory {
 
@@ -82,8 +81,7 @@ class ArtAggregate private constructor(
                     Resource(UNDEFINED),
                     User(UNKNOWN),
                     ArtGenre.UNDEFINED,
-                    ArtStatus.UNDER_CREATION,
-                    emptyList()
+                    ArtStatus.UNDER_CREATION
             )
         }
 

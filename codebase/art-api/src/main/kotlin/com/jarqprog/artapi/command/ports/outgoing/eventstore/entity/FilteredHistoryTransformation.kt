@@ -7,7 +7,7 @@ import java.util.stream.Collectors
 
 class FilteredHistoryTransformation : BiFunction<ArtHistoryDescriptor, Instant, ArtHistory> {
 
-    private val descriptorToEvent = DescriptorToEvent()
+    private val descriptorToEvent = ToEvent()
 
     override fun apply(historyDescriptor: ArtHistoryDescriptor, stateAt: Instant): ArtHistory {
 
