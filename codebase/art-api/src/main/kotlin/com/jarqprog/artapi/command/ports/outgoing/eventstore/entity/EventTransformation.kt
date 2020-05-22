@@ -1,19 +1,12 @@
 package com.jarqprog.artapi.command.ports.outgoing.eventstore.entity
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect
-import com.fasterxml.jackson.annotation.PropertyAccessor
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.jarqprog.artapi.command.ports.outgoing.MAPPER
 import com.jarqprog.artapi.domain.events.ArtCreated
 import com.jarqprog.artapi.domain.events.ArtEvent
 import com.jarqprog.artapi.domain.events.ResourceChanged
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.exceptions.EventStoreFailure
 import java.util.*
 import java.util.function.Function
-
-private val MAPPER = jacksonObjectMapper()
-        .registerModule(JavaTimeModule())
-        .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
 
 class ToDescriptor : Function<ArtEvent, ArtEventDescriptor> {
 

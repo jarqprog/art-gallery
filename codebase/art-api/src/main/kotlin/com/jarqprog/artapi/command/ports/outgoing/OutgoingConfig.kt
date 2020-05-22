@@ -1,5 +1,9 @@
 package com.jarqprog.artapi.command.ports.outgoing
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect
+import com.fasterxml.jackson.annotation.PropertyAccessor
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.EventStorage
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.EventStore
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.dao.sql.HistoryRepository
@@ -11,6 +15,10 @@ import com.jarqprog.artapi.command.ports.outgoing.projection.dao.sql.ProjectionJ
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+
+internal val MAPPER = jacksonObjectMapper()
+        .registerModule(JavaTimeModule())
+        .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
 
 @Configuration
 class OutgoingConfig {
