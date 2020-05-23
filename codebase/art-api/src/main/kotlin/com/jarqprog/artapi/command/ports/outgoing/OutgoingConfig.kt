@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.EventStorage
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.EventStore
+import com.jarqprog.artapi.command.ports.outgoing.eventstore.dao.inmemory.InMemorySnapshotDatabase
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.dao.sql.HistoryRepository
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.dao.sql.EventStreamJDBC
 import com.jarqprog.artapi.command.ports.outgoing.projection.ProjectionHandler
@@ -15,6 +16,7 @@ import com.jarqprog.artapi.command.ports.outgoing.projection.dao.sql.ProjectionJ
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import java.util.concurrent.ConcurrentHashMap
 
 internal val MAPPER = jacksonObjectMapper()
         .registerModule(JavaTimeModule())
@@ -25,7 +27,7 @@ class OutgoingConfig {
 
     @Bean
     fun eventStore(@Autowired streamRepository: HistoryRepository): EventStore {
-        return EventStorage(EventStreamJDBC(streamRepository))
+        return EventStorage(EventStreamJDBC(streamRepository), InMemorySnapshotDatabase(ConcurrentHashMap()))
     }
 
     @Bean

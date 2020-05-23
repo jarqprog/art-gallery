@@ -7,6 +7,7 @@ import com.jarqprog.artapi.domain.events.ArtEvent
 import com.jarqprog.artapi.domain.events.ResourceChanged
 import com.jarqprog.artapi.domain.vo.Resource
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.dao.inmemory.InMemoryEventStreamDatabase
+import com.jarqprog.artapi.command.ports.outgoing.eventstore.dao.inmemory.InMemorySnapshotDatabase
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -17,12 +18,16 @@ import java.util.concurrent.ConcurrentHashMap
 internal class LoadingFutureEventsExperimental {
 
     private lateinit var eventStreamDatabase: EventStreamDatabase
+    private lateinit var snapshotDatabase: SnapshotDatabase
     private lateinit var eventStore: EventStore
 
     @BeforeEach
     fun prepareStorage() {
         eventStreamDatabase = InMemoryEventStreamDatabase(ConcurrentHashMap())
-        eventStore = EventStorage(eventStreamDatabase)
+        snapshotDatabase = InMemorySnapshotDatabase(ConcurrentHashMap())
+
+        eventStore = EventStorage(eventStreamDatabase, snapshotDatabase)
+
         HISTORY_WITH_THREE_EVENTS.events().plus(ANOTHER_HISTORY.events())
                 .forEach { event -> eventStore.save(event) }
     }

@@ -4,6 +4,7 @@ import arrow.core.getOrHandle
 import com.jarqprog.artapi.domain.HISTORY_WITH_THREE_EVENTS
 import com.jarqprog.artapi.domain.NOT_USED_HISTORY_ID
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.dao.inmemory.InMemoryEventStreamDatabase
+import com.jarqprog.artapi.command.ports.outgoing.eventstore.dao.inmemory.InMemorySnapshotDatabase
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.BeforeEach
@@ -13,12 +14,16 @@ import java.util.concurrent.ConcurrentHashMap
 internal class LoadingEvents {
 
     private lateinit var eventStreamDatabase: EventStreamDatabase
+    private lateinit var snapshotDatabase: SnapshotDatabase
     private lateinit var eventStore: EventStore
 
     @BeforeEach
     fun prepareStorage() {
         eventStreamDatabase = InMemoryEventStreamDatabase(ConcurrentHashMap())
-        eventStore = EventStorage(eventStreamDatabase)
+        snapshotDatabase = InMemorySnapshotDatabase(ConcurrentHashMap())
+
+        eventStore = EventStorage(eventStreamDatabase, snapshotDatabase)
+
         HISTORY_WITH_THREE_EVENTS.events().plus(ANOTHER_HISTORY.events())
                 .forEach { event -> eventStore.save(event) }
     }

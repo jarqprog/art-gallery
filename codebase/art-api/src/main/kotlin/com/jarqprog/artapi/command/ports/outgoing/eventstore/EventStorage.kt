@@ -19,7 +19,10 @@ import org.slf4j.LoggerFactory
 import java.time.Instant
 import java.util.*
 
-class EventStorage(private val eventStreamDatabase: EventStreamDatabase) : EventStore {
+class EventStorage(
+        private val eventStreamDatabase: EventStreamDatabase,
+        private val snapshotDatabase: SnapshotDatabase
+        ) : EventStore {
 
     private val eventToDescriptor = ToDescriptor()
     private val historyTransformation = HistoryTransformation()
@@ -39,7 +42,9 @@ class EventStorage(private val eventStreamDatabase: EventStreamDatabase) : Event
         return runBlocking {
             Either.catch {
                 eventStreamDatabase.load(artId)
-                        .map(historyTransformation)
+                        .map { historyDescriptor -> historyTransformation.apply(historyDescriptor,
+                                snapshotDatabase.loadLatest(artId))
+                        }
                         .also { logger.info("fetching history for art id: $artId") }
             }
                     .mapLeft { failure -> EventStoreFailure.fromException(failure) }
