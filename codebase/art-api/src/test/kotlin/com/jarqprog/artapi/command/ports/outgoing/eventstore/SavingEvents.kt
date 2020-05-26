@@ -1,13 +1,13 @@
 package com.jarqprog.artapi.command.ports.outgoing.eventstore
 
 
-import com.jarqprog.artapi.command.EVENT_ART_CREATED
-import com.jarqprog.artapi.command.EVENT_RESOURCE_URL_CHANGED_V1
-import com.jarqprog.artapi.command.EVENT_RESOURCE_URL_CHANGED_V2
-import com.jarqprog.artapi.command.HISTORY_WITH_THREE_EVENTS
-import com.jarqprog.artapi.command.ports.outgoing.EventStore
+import com.jarqprog.artapi.domain.EVENT_ART_CREATED
+import com.jarqprog.artapi.domain.EVENT_RESOURCE_URL_CHANGED_V1
+import com.jarqprog.artapi.domain.EVENT_RESOURCE_URL_CHANGED_V2
+import com.jarqprog.artapi.domain.HISTORY_WITH_THREE_EVENTS
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.exceptions.EventStoreFailure
-import com.jarqprog.artapi.command.ports.outgoing.eventstore.inmemory.InMemoryEventStreamDatabase
+import com.jarqprog.artapi.command.ports.outgoing.eventstore.dao.inmemory.InMemoryEventStreamDatabase
+import com.jarqprog.artapi.command.ports.outgoing.eventstore.dao.inmemory.InMemorySnapshotDatabase
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -18,12 +18,15 @@ import java.util.concurrent.ConcurrentHashMap
 internal class SavingEvents {
 
     private lateinit var eventStreamDatabase: EventStreamDatabase
+    private lateinit var snapshotDatabase: SnapshotDatabase
     private lateinit var eventStore: EventStore
 
     @BeforeEach
     fun prepareStorage() {
         eventStreamDatabase = InMemoryEventStreamDatabase(ConcurrentHashMap())
-        eventStore = EventStorage(eventStreamDatabase)
+        snapshotDatabase = InMemorySnapshotDatabase(ConcurrentHashMap())
+
+        eventStore = EventStorage(eventStreamDatabase, snapshotDatabase)
     }
 
     @Test

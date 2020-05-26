@@ -1,12 +1,14 @@
 package com.jarqprog.artapi.command.ports.outgoing.eventstore
 
-import com.jarqprog.artapi.command.HISTORY_WITH_THREE_EVENTS
-import com.jarqprog.artapi.command.domain.ArtHistory
-import com.jarqprog.artapi.command.domain.events.ArtEvent
-import com.jarqprog.artapi.command.domain.events.ResourceChanged
-import com.jarqprog.artapi.command.domain.vo.Resource
-import com.jarqprog.artapi.command.ports.outgoing.EventStore
-import com.jarqprog.artapi.command.ports.outgoing.eventstore.inmemory.InMemoryEventStreamDatabase
+import arrow.core.getOrHandle
+import com.jarqprog.artapi.domain.HISTORY_WITH_THREE_EVENTS
+import com.jarqprog.artapi.domain.ArtHistory
+import com.jarqprog.artapi.domain.events.ArtEvent
+import com.jarqprog.artapi.domain.events.ResourceChanged
+import com.jarqprog.artapi.domain.vo.Resource
+import com.jarqprog.artapi.command.ports.outgoing.eventstore.dao.inmemory.InMemoryEventStreamDatabase
+import com.jarqprog.artapi.command.ports.outgoing.eventstore.dao.inmemory.InMemorySnapshotDatabase
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Instant
@@ -16,12 +18,16 @@ import java.util.concurrent.ConcurrentHashMap
 internal class LoadingFutureEventsExperimental {
 
     private lateinit var eventStreamDatabase: EventStreamDatabase
+    private lateinit var snapshotDatabase: SnapshotDatabase
     private lateinit var eventStore: EventStore
 
     @BeforeEach
     fun prepareStorage() {
         eventStreamDatabase = InMemoryEventStreamDatabase(ConcurrentHashMap())
-        eventStore = EventStorage(eventStreamDatabase)
+        snapshotDatabase = InMemorySnapshotDatabase(ConcurrentHashMap())
+
+        eventStore = EventStorage(eventStreamDatabase, snapshotDatabase)
+
         HISTORY_WITH_THREE_EVENTS.events().plus(ANOTHER_HISTORY.events())
                 .forEach { event -> eventStore.save(event) }
     }
@@ -59,23 +65,34 @@ internal class LoadingFutureEventsExperimental {
         )
 
         future.forEach { event -> eventStore.save(event) }
-
-        val firstFetchedHistory = eventStore.load(identifier, eightyDaysInTheFuture).get()
-        val secondFetchedHistory = eventStore.load(identifier, ninetyDaysInTheFuture).get()
-        val thirdFetchedHistory = eventStore.load(identifier, hundredDaysInTheFuture).get()
-
-        val shouldBeTheSameAsSecond = eventStore.load(identifier, ninetyDaysInTheFuture
-                .plusSeconds(120)).get()
-
         val merged = ANOTHER_HISTORY.events().plus(future)
 
-        val firstExpectedHistory = ArtHistory(identifier, filterEventsByPointInTime(merged, eightyDaysInTheFuture))
-        val secondExpectedHistory = ArtHistory(identifier, filterEventsByPointInTime(merged, ninetyDaysInTheFuture))
-        val thirdExpectedHistory = ArtHistory(identifier, filterEventsByPointInTime(merged, hundredDaysInTheFuture))
+        val firstExpectedHistory = ArtHistory.withEvents(filterEventsByPointInTime(merged, eightyDaysInTheFuture))
+        eventStore.load(identifier, eightyDaysInTheFuture)
+                .map { optionalHistory ->
+                    optionalHistory
+                            .map { history -> assertHistoriesAreTheSame(history, firstExpectedHistory) }
+                            .orElseGet { Assertions.fail("was empty") }
+                }
+                .getOrHandle { Assertions.fail("has failure") }
 
-        assertHistoriesAreTheSame(firstFetchedHistory, firstExpectedHistory)
-        assertHistoriesAreTheSame(secondFetchedHistory, secondExpectedHistory)
-        assertHistoriesAreTheSame(thirdFetchedHistory, thirdExpectedHistory)
-        assertHistoriesAreTheSame(shouldBeTheSameAsSecond, secondFetchedHistory)
+        val secondExpectedHistory = ArtHistory.withEvents(filterEventsByPointInTime(merged, ninetyDaysInTheFuture))
+        eventStore.load(identifier, ninetyDaysInTheFuture)
+                .map { optionalHistory ->
+                    optionalHistory
+                            .map { history -> assertHistoriesAreTheSame(history, secondExpectedHistory) }
+                            .orElseGet { Assertions.fail("was empty") }
+                }
+                .getOrHandle { Assertions.fail("has failure") }
+
+
+        val thirdExpectedHistory = ArtHistory.withEvents(filterEventsByPointInTime(merged, hundredDaysInTheFuture))
+        eventStore.load(identifier, hundredDaysInTheFuture)
+                .map { optionalHistory ->
+                    optionalHistory
+                            .map { history -> assertHistoriesAreTheSame(history, thirdExpectedHistory) }
+                            .orElseGet { Assertions.fail("was empty") }
+                }
+                .getOrHandle { Assertions.fail("has failure") }
     }
 }

@@ -1,10 +1,10 @@
 package com.jarqprog.artapi.command.api.commanddispatching
 
-import com.jarqprog.artapi.command.EVENT_ART_CREATED
+import com.jarqprog.artapi.domain.EVENT_ART_CREATED
 import com.jarqprog.artapi.command.api.commandvalidation.CommandValidator
-import com.jarqprog.artapi.command.domain.*
-import com.jarqprog.artapi.command.domain.commands.CreateArt
-import com.jarqprog.artapi.command.domain.events.ArtCreated
+import com.jarqprog.artapi.domain.*
+import com.jarqprog.artapi.command.api.commands.CreateArt
+import com.jarqprog.artapi.domain.events.ArtCreated
 import com.jarqprog.artapi.command.api.exceptions.CommandProcessingFailure
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
@@ -44,7 +44,7 @@ internal class ArtCreation {
                 .map { event -> event as ArtCreated }
                 .map { event ->
                     assertAll("should have proper values - provided or default",
-                            { assertEquals(EVENT_ART_CREATED.eventName(), event.eventName()) },
+                            { assertEquals(EVENT_ART_CREATED.name(), event.name()) },
                             { assertEquals(EVENT_ART_CREATED.version(), event.version()) },
                             { assertEquals(EVENT_ART_CREATED.resource(), event.resource()) },
                             { assertEquals(EVENT_ART_CREATED.addedBy(), event.addedBy()) },
@@ -57,7 +57,7 @@ internal class ArtCreation {
     @Test
     fun shouldReturnExceptionOnNotEmptyHistory() {
 
-        val errorOrEvent = handler.dispatch(command, ArtHistory(command.artId, listOf(EVENT_ART_CREATED)))
+        val errorOrEvent = handler.dispatch(command, ArtHistory.withEvents(listOf(EVENT_ART_CREATED)))
 
         assertTrue(errorOrEvent.isLeft())
         errorOrEvent

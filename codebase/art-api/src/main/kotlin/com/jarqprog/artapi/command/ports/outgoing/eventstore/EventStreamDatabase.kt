@@ -1,6 +1,6 @@
 package com.jarqprog.artapi.command.ports.outgoing.eventstore
 
-import com.jarqprog.artapi.command.domain.vo.Identifier
+import com.jarqprog.artapi.domain.vo.Identifier
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.entity.ArtHistoryDescriptor
 import java.util.*
 

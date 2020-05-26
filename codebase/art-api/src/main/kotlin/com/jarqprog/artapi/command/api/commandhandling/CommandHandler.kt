@@ -5,10 +5,9 @@ import arrow.core.getOrHandle
 import com.jarqprog.artapi.command.api.CommandDispatching
 import com.jarqprog.artapi.command.api.CommandHandling
 import com.jarqprog.artapi.command.api.EventPublishing
-import com.jarqprog.artapi.command.domain.*
-import com.jarqprog.artapi.command.domain.commands.ArtCommand
-import com.jarqprog.artapi.command.api.exceptions.CommandProcessingFailure
-import com.jarqprog.artapi.command.ports.outgoing.EventStore
+import com.jarqprog.artapi.domain.*
+import com.jarqprog.artapi.command.api.commands.ArtCommand
+import com.jarqprog.artapi.command.ports.outgoing.eventstore.EventStore
 
 import java.util.*
 
@@ -20,17 +19,18 @@ class CommandHandler(
 
 ) : CommandHandling {
 
-    override fun handle(command: ArtCommand): Optional<CommandProcessingFailure> {
+    override fun handle(command: ArtCommand): Optional<Throwable> {
         return eventStore.load(command.artId())
-                .or { Optional.of(ArtHistory.initialize(command.artId)) }
-                .map { history -> commandDispatching.dispatch(command, history) }
-                .flatMap { failureOrEvent ->
-                    failureOrEvent
-                            .map(eventPublishing::publish)
-                            .map { optionalFailure ->
-                                optionalFailure
-                                        .map { failure -> CommandProcessingFailure.fromThrowable(failure) }
-                            }.getOrHandle { failure -> Optional.of(failure) }
+                .map { optionalHistory ->
+                    optionalHistory
+                            .or { Optional.of(ArtHistory.initialize(command.artId)) }
+                            .map { history -> commandDispatching.dispatch(command, history) }
+                            .flatMap { failureOrEvent ->
+                                failureOrEvent
+                                        .map(eventPublishing::publish)
+                                        .getOrHandle { failure -> Optional.of(failure) }
+                            }
                 }
+                .getOrHandle { failure -> Optional.of(failure) }
     }
 }

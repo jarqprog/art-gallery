@@ -1,14 +1,14 @@
 package com.jarqprog.artapi.command.api.commanddispatching
 
 
-import com.jarqprog.artapi.command.domain.events.ArtCreated
+import com.jarqprog.artapi.domain.events.ArtCreated
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.assertAll
 
 internal fun assertArtCreatedEventsEquals(expected: ArtCreated, event: ArtCreated) {
 
     assertAll("art created events should be equal - without comparing timestamps",
-            { Assertions.assertEquals(expected.eventName(), event.eventName()) },
+            { Assertions.assertEquals(expected.name(), event.name()) },
             { Assertions.assertEquals(expected.artId(), event.artId()) },
             { Assertions.assertEquals(expected.version(), event.version()) },
             { Assertions.assertEquals(expected.author(), event.author()) },

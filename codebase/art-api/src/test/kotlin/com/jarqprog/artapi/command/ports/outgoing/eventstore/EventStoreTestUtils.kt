@@ -1,21 +1,19 @@
 package com.jarqprog.artapi.command.ports.outgoing.eventstore
 
 
-import com.jarqprog.artapi.command.*
-import com.jarqprog.artapi.command.ANY_OTHER_RESOURCE
-import com.jarqprog.artapi.command.ANY_RESOURCE
-import com.jarqprog.artapi.command.ANY_RESOURCE_WITH_LONG_PATH
-import com.jarqprog.artapi.command.AUTHOR_MARIA
-import com.jarqprog.artapi.command.TIME_NOW
-import com.jarqprog.artapi.command.USER_MARIA
-import com.jarqprog.artapi.command.domain.ArtGenre
-import com.jarqprog.artapi.command.domain.ArtHistory
-import com.jarqprog.artapi.command.domain.ArtStatus
-import com.jarqprog.artapi.command.domain.events.ArtCreated
-import com.jarqprog.artapi.command.domain.events.ArtEvent
-import com.jarqprog.artapi.command.domain.events.ResourceChanged
-import com.jarqprog.artapi.command.domain.vo.Identifier
+import com.jarqprog.artapi.domain.events.ArtCreated
+import com.jarqprog.artapi.domain.events.ArtEvent
+import com.jarqprog.artapi.domain.events.ResourceChanged
+import com.jarqprog.artapi.domain.vo.Identifier
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.entity.ArtHistoryDescriptor
+import com.jarqprog.artapi.domain.*
+import com.jarqprog.artapi.domain.ANY_OTHER_IDENTIFIER
+import com.jarqprog.artapi.domain.ANY_OTHER_RESOURCE
+import com.jarqprog.artapi.domain.ANY_RESOURCE
+import com.jarqprog.artapi.domain.ANY_RESOURCE_WITH_LONG_PATH
+import com.jarqprog.artapi.domain.AUTHOR_MARIA
+import com.jarqprog.artapi.domain.TIME_NOW
+import com.jarqprog.artapi.domain.USER_MARIA
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.assertAll
 import java.time.Instant
@@ -54,8 +52,7 @@ internal val ANOTHER_EVENT_RESOURCE_URL_CHANGED_V3 = ResourceChanged(
         ANY_OTHER_RESOURCE
 )
 
-internal val ANOTHER_HISTORY = ArtHistory(
-        ANOTHER_EVENT_ART_CREATED.artId(),
+internal val ANOTHER_HISTORY = ArtHistory.withEvents(
         listOf(
                 ANOTHER_EVENT_ART_CREATED,
                 ANOTHER_EVENT_RESOURCE_URL_CHANGED_V1,
@@ -79,8 +76,8 @@ internal fun assertHistoryDescriptorShouldMatchWithEvents(firstHistory: ArtHisto
                 for (index in sortedHistory.indices) {
                     assertEquals(Identifier(sortedSerializedEvents[index].artId), sortedHistory[index].artId())
                     assertEquals(sortedSerializedEvents[index].version, sortedHistory[index].version())
-                    assertEquals(sortedSerializedEvents[index].eventName, sortedHistory[index].eventName())
-                    assertEquals(sortedSerializedEvents[index].eventType, sortedHistory[index].eventType())
+                    assertEquals(sortedSerializedEvents[index].name, sortedHistory[index].name())
+                    assertEquals(sortedSerializedEvents[index].type, sortedHistory[index].type())
                     assertEquals(sortedSerializedEvents[index].timestamp, sortedHistory[index].timestamp())
                 }
             }
@@ -102,16 +99,15 @@ internal fun assertHistoriesAreTheSame(firstHistory: ArtHistory, secondHistory: 
                     assertEquals(firstHistoryEvents[index].artId(), secondHistoryEvents[index].artId())
                     assertEquals(firstHistoryEvents[index].version(), secondHistoryEvents[index].version())
                     assertEquals(firstHistoryEvents[index].timestamp(), secondHistoryEvents[index].timestamp())
-                    assertEquals(firstHistoryEvents[index].eventName(), secondHistoryEvents[index].eventName())
-                    assertEquals(firstHistoryEvents[index].eventType(), secondHistoryEvents[index].eventType())
+                    assertEquals(firstHistoryEvents[index].name(), secondHistoryEvents[index].name())
+                    assertEquals(firstHistoryEvents[index].type(), secondHistoryEvents[index].type())
                 }
             }
     )
 }
 
 internal fun filterHistoryByPointInTime(history: ArtHistory, pointInTime: Instant): ArtHistory {
-    return ArtHistory(
-            history.artId(),
+    return ArtHistory.withEvents(
             history.events().stream()
                     .filter { event -> event.timestamp() <= pointInTime }
                     .collect(Collectors.toList())

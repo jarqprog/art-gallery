@@ -1,40 +1,65 @@
 package com.jarqprog.artapi.command.ports.outgoing.eventstore
 
-import com.jarqprog.artapi.command.domain.ArtHistory
-import com.jarqprog.artapi.command.domain.events.ArtCreated
-import com.jarqprog.artapi.command.domain.events.ArtEvent
-import com.jarqprog.artapi.command.domain.vo.Identifier
-import com.jarqprog.artapi.command.ports.outgoing.EventStore
+import arrow.core.Either
+import com.jarqprog.artapi.command.api.exceptions.IncorrectVersion
+import com.jarqprog.artapi.command.api.exceptions.NotFound
+import com.jarqprog.artapi.domain.ArtHistory
+import com.jarqprog.artapi.domain.events.ArtCreated
+import com.jarqprog.artapi.domain.events.ArtEvent
+import com.jarqprog.artapi.domain.vo.Identifier
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.entity.ArtHistoryDescriptor
-import com.jarqprog.artapi.command.ports.outgoing.eventstore.entity.EventToDescriptor
+import com.jarqprog.artapi.command.ports.outgoing.eventstore.entity.ToDescriptor
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.entity.FilteredHistoryTransformation
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.entity.HistoryTransformation
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.exceptions.EventStoreFailure
 import io.vavr.control.Try
+
+import kotlinx.coroutines.runBlocking
+import org.slf4j.LoggerFactory
 import java.time.Instant
 import java.util.*
 
-class EventStorage(private val eventStreamDatabase: EventStreamDatabase) : EventStore {
+class EventStorage(
+        private val eventStreamDatabase: EventStreamDatabase,
+        private val snapshotDatabase: SnapshotDatabase
+        ) : EventStore {
 
-    private val eventToDescriptor = EventToDescriptor()
+    private val eventToDescriptor = ToDescriptor()
     private val historyTransformation = HistoryTransformation()
     private val filteredHistoryTransformation = FilteredHistoryTransformation()
 
+    private val logger = LoggerFactory.getLogger(javaClass)
+
     override fun save(event: ArtEvent): Optional<EventStoreFailure> {
+        logger.info("about to save event $event")
         return when (event) {
             is ArtCreated -> initializeStream(event)
             else -> appendToStream(event)
         }
     }
 
-    override fun load(artId: Identifier): Optional<ArtHistory> {
-        return eventStreamDatabase.load(artId)
-                .map(historyTransformation)
+    override fun load(artId: Identifier): Either<EventStoreFailure, Optional<ArtHistory>> {
+        return runBlocking {
+            Either.catch {
+                eventStreamDatabase.load(artId)
+                        .map { historyDescriptor -> historyTransformation.apply(historyDescriptor,
+                                snapshotDatabase.loadLatest(artId))
+                        }
+                        .also { logger.info("fetching history for art id: $artId") }
+            }
+                    .mapLeft { failure -> EventStoreFailure.fromException(failure) }
+        }
     }
 
-    override fun load(artId: Identifier, stateAt: Instant): Optional<ArtHistory> {
-        return eventStreamDatabase.load(artId)
-                .map { historyDescriptor -> filteredHistoryTransformation.apply(historyDescriptor, stateAt) }
+    override fun load(artId: Identifier, stateAt: Instant): Either<EventStoreFailure, Optional<ArtHistory>> {
+        return runBlocking {
+            Either.catch {
+                eventStreamDatabase.load(artId)
+                        .map { historyDescriptor -> filteredHistoryTransformation.apply(historyDescriptor, stateAt) }
+                        .also { logger.info("fetching history for art id: $artId") }
+            }
+                    .mapLeft { failure -> EventStoreFailure.fromException(failure) }
+        }
     }
 
     private fun initializeStream(event: ArtCreated): Optional<EventStoreFailure> {
@@ -42,7 +67,6 @@ class EventStorage(private val eventStreamDatabase: EventStreamDatabase) : Event
         val version = event.version()
         val timestamp = event.timestamp()
         return Try.run {
-            if (version != 0) throw EventStoreFailure("Incorrect version. Expected: 0 but is: $version")
             if (eventStreamDatabase.historyExistsById(artIdentifier)) throw EventStoreFailure("History already exists for art id=$artIdentifier")
             val newEventStream = ArtHistoryDescriptor(
                     artIdentifier.value,
@@ -51,6 +75,7 @@ class EventStorage(private val eventStreamDatabase: EventStreamDatabase) : Event
                     listOf(eventToDescriptor.apply(event))
             )
             eventStreamDatabase.save(newEventStream)
+            logger.info("initialized event stream with event: $event")
         }
                 .fold(
                         { ex -> Optional.of(EventStoreFailure(ex.localizedMessage, ex)) },
@@ -64,7 +89,8 @@ class EventStorage(private val eventStreamDatabase: EventStreamDatabase) : Event
             eventStreamDatabase.load(event.artId())
                     .map { eventStream -> eventStream.add(eventToDescriptor.apply(event)) }
                     .map { updated -> eventStreamDatabase.save(updated) }
-                    .orElseThrow { EventStoreFailure.notFound(event.artId()) }
+                    .orElseThrow { NotFound(event.artId()) }
+            logger.info("event $event appended to stream")
         }
                 .onFailure { ex -> EventStoreFailure(ex.localizedMessage, ex) }
                 .fold(
@@ -77,7 +103,7 @@ class EventStorage(private val eventStreamDatabase: EventStreamDatabase) : Event
         eventStreamDatabase.streamVersion(event.artId())
                 .ifPresent { streamVersion ->
                     if (isNotExpectedVersion(streamVersion, event))
-                        throw EventStoreFailure.concurrentWrite(event)
+                        throw IncorrectVersion.fromEvent(event)
                 }
     }
 
