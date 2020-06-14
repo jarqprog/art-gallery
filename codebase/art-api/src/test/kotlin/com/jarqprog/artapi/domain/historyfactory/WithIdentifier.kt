@@ -1,8 +1,8 @@
 package com.jarqprog.artapi.domain.historyfactory
 
-import com.jarqprog.artapi.domain.ANY_IDENTIFIER
 import com.jarqprog.artapi.domain.ArtAggregate.Factory.INITIAL_VERSION
 import com.jarqprog.artapi.domain.ArtHistory
+import com.jarqprog.artapi.domain.CommandSupport.ANY_IDENTIFIER
 import com.jarqprog.artapi.domain.events.ArtEvent
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test

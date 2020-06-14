@@ -4,9 +4,9 @@ package com.jarqprog.artapi.command.ports.outgoing.eventstore
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.dao.inmemory.InMemoryEventStreamDatabase
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.dao.inmemory.InMemorySnapshotDatabase
 import com.jarqprog.artapi.domain.*
-import com.jarqprog.artapi.domain.EVENT_ART_CREATED
-import com.jarqprog.artapi.domain.EVENT_RESOURCE_URL_CHANGED_V1
-import com.jarqprog.artapi.domain.TIME_NOW
+import com.jarqprog.artapi.domain.EventSupport.EVENT_ART_CREATED
+import com.jarqprog.artapi.domain.EventSupport.EVENT_RESOURCE_URL_CHANGED_V1
+import com.jarqprog.artapi.domain.commands.CreateArt
 import com.jarqprog.artapi.domain.events.ArtCreated
 import com.jarqprog.artapi.domain.vo.Author
 import com.jarqprog.artapi.domain.vo.Resource
@@ -58,41 +58,17 @@ internal class InitializingHistory {
 
         // given
         eventStore.save(EVENT_ART_CREATED).subscribe()
-        val eventShouldNotBeSaved = ArtCreated(
-                artId,
-                0,
-                TIME_NOW.minusSeconds(1),
-                Author("Tom"),
-                Resource("/anyPath"),
-                User("Tom"),
-                ArtGenre.UNDEFINED,
-                ArtStatus.ACTIVE
-        )
 
-        // when
-        val result = eventStore.save(eventShouldNotBeSaved)
-
-        // then
-        StepVerifier.create(result)
-                .expectError()
-                .verify()
-    }
-
-    @Test
-    fun `should return failure on initializing history if event has incorrect version`() {
-
-        // given
-        val incorrectVersion = 1
-        val eventShouldNotBeSaved = ArtCreated(
+        val commandWithDuplicatedArtId = CreateArt(
                 EVENT_ART_CREATED.artId(),
-                incorrectVersion,
-                TIME_NOW.minusSeconds(1),
                 Author("Tom"),
                 Resource("/anyPath"),
                 User("Tom"),
                 ArtGenre.UNDEFINED,
                 ArtStatus.ACTIVE
         )
+
+        val eventShouldNotBeSaved = ArtCreated.from(commandWithDuplicatedArtId)
 
         // when
         val result = eventStore.save(eventShouldNotBeSaved)

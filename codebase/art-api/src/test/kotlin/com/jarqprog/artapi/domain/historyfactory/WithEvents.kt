@@ -1,8 +1,10 @@
 package com.jarqprog.artapi.domain.historyfactory
 
 import com.jarqprog.artapi.domain.*
-import com.jarqprog.artapi.domain.ONE_EVENT_LIST
-import com.jarqprog.artapi.domain.assertHistoryAndEventsValuesMatch
+import com.jarqprog.artapi.domain.ArtTestAssertions.assertHistoryAndEventsValuesMatch
+import com.jarqprog.artapi.domain.ArtTestAssertions.assertStatesEquals
+import com.jarqprog.artapi.domain.EventSupport.ONE_EVENT_LIST
+import com.jarqprog.artapi.domain.EventSupport.THREE_EVENTS_LIST
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.lang.Exception

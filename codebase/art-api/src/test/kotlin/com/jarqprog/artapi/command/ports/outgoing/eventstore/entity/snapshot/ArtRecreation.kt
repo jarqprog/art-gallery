@@ -3,10 +3,10 @@ package com.jarqprog.artapi.command.ports.outgoing.eventstore.entity.snapshot
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.entity.Snapshot
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.entity.SnapshotCreation
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.entity.SnapshotToArt
-import com.jarqprog.artapi.domain.ANY_IDENTIFIER
 import com.jarqprog.artapi.domain.ArtAggregate
-import com.jarqprog.artapi.domain.HISTORY_WITH_THREE_EVENTS
-import com.jarqprog.artapi.domain.assertStatesEquals
+import com.jarqprog.artapi.domain.ArtTestAssertions.assertStatesEquals
+import com.jarqprog.artapi.domain.CommandSupport.ANY_IDENTIFIER
+import com.jarqprog.artapi.domain.HistorySupport.HISTORY_WITH_THREE_EVENTS
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.function.Function

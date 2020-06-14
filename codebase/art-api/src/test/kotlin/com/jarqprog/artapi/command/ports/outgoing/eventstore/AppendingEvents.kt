@@ -3,11 +3,15 @@ package com.jarqprog.artapi.command.ports.outgoing.eventstore
 
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.dao.inmemory.InMemoryEventStreamDatabase
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.dao.inmemory.InMemorySnapshotDatabase
-import com.jarqprog.artapi.domain.*
-import com.jarqprog.artapi.domain.EVENT_ART_CREATED
-import com.jarqprog.artapi.domain.EVENT_RESOURCE_URL_CHANGED_V1
-import com.jarqprog.artapi.domain.EVENT_RESOURCE_URL_CHANGED_V2
-import com.jarqprog.artapi.domain.EVENT_RESOURCE_URL_CHANGED_V4
+import com.jarqprog.artapi.domain.EventSupport.ANOTHER_EVENT_ART_CREATED
+import com.jarqprog.artapi.domain.EventSupport.ANOTHER_EVENT_RESOURCE_URL_CHANGED_V1
+import com.jarqprog.artapi.domain.EventSupport.ANOTHER_EVENT_RESOURCE_URL_CHANGED_V2
+import com.jarqprog.artapi.domain.EventSupport.ANOTHER_EVENT_RESOURCE_URL_CHANGED_V3
+import com.jarqprog.artapi.domain.EventSupport.EVENT_ART_CREATED
+import com.jarqprog.artapi.domain.EventSupport.EVENT_RESOURCE_URL_CHANGED_V1
+import com.jarqprog.artapi.domain.EventSupport.EVENT_RESOURCE_URL_CHANGED_V2
+import com.jarqprog.artapi.domain.EventSupport.EVENT_RESOURCE_URL_CHANGED_V3
+import com.jarqprog.artapi.domain.EventSupport.EVENT_RESOURCE_URL_CHANGED_V4
 import com.jarqprog.artapi.domain.events.ArtEvent
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

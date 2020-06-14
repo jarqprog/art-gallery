@@ -11,8 +11,8 @@ import com.jarqprog.artapi.domain.events.ArtCreated
 import com.jarqprog.artapi.domain.events.ArtEvent
 import com.jarqprog.artapi.domain.events.ResourceChanged
 import com.jarqprog.artapi.command.api.exceptions.CommandProcessingFailure
+
 import reactor.core.publisher.Mono
-import java.time.Instant
 
 class CommandDispatcher(private val validation: CommandValidation) : CommandDispatching {
 
@@ -28,31 +28,12 @@ class CommandDispatcher(private val validation: CommandValidation) : CommandDisp
     private fun process(command: CreateArt, history: ArtHistory): Mono<ArtEvent> {
         val initialState = ArtAggregate.initialState(command.artId())
         return validation.validate(command, history, initialState)
-                .map {
-                    ArtCreated(
-                            command.artId(),
-                            command.version(),
-                            Instant.now(),
-                            command.author(),
-                            command.resource(),
-                            command.addedBy(),
-                            command.artGenre(),
-                            command.artStatus()
-                    )
-                }
+                .map { ArtCreated.from(command) }
     }
 
     private fun process(command: ChangeResource, history: ArtHistory): Mono<ArtEvent> {
-        val uuid = command.artId()
         val currentState = ArtAggregate.replayAll(history)
         return validation.validate(command, history, currentState)
-                .map {
-                    ResourceChanged(
-                            uuid,
-                            command.version(),
-                            Instant.now(),
-                            command.resource()
-                    )
-                }
+                .map { ResourceChanged.from(command) }
     }
 }

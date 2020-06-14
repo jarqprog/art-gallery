@@ -3,8 +3,9 @@ package com.jarqprog.artapi.command.ports.outgoing.eventstore
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.dao.inmemory.InMemoryEventStreamDatabase
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.dao.inmemory.InMemorySnapshotDatabase
 import com.jarqprog.artapi.domain.*
-import com.jarqprog.artapi.domain.HISTORY_WITH_THREE_EVENTS
-import com.jarqprog.artapi.domain.NOT_USED_HISTORY_ID
+import com.jarqprog.artapi.domain.CommandSupport.NOT_USED_HISTORY_ID
+import com.jarqprog.artapi.domain.HistorySupport.ANOTHER_HISTORY
+import com.jarqprog.artapi.domain.HistorySupport.HISTORY_WITH_THREE_EVENTS
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import reactor.test.StepVerifier

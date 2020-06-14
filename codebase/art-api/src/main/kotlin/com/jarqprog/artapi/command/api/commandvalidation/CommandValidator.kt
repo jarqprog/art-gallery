@@ -53,7 +53,7 @@ private fun validateArtIdEquality(command: ArtCommand, currentState: ArtAggregat
 }
 
 private fun validateCommandVersionOnUpdate(command: ArtCommand, currentState: ArtAggregate) {
-    val expectedVersion = currentState.version().plus(1)
+    val expectedVersion = currentState.version()
     raiseFailureIf(command.version() != expectedVersion,
             "invalid version for $command, expected version: $expectedVersion")
 }
