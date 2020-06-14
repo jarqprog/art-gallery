@@ -1,5 +1,8 @@
 package com.jarqprog.artapi.domain.vo
 
-import com.jarqprog.artapi.UNKNOWN
+data class Author(val name: String = UNKNOWN, val user: User = User()) {
 
-data class Author(val name: String = UNKNOWN, val user: User = User(UNKNOWN))
+    companion object Const {
+        const val UNKNOWN = "unknown"
+    }
+}

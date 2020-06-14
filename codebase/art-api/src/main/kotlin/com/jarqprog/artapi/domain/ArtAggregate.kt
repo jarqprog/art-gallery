@@ -1,8 +1,5 @@
 package com.jarqprog.artapi.domain
 
-
-import com.jarqprog.artapi.UNDEFINED
-import com.jarqprog.artapi.UNKNOWN
 import com.jarqprog.artapi.domain.events.ArtCreated
 import com.jarqprog.artapi.domain.events.ArtEvent
 import com.jarqprog.artapi.domain.events.ResourceChanged
@@ -11,9 +8,8 @@ import com.jarqprog.artapi.domain.vo.Author
 import com.jarqprog.artapi.domain.vo.Identifier
 import com.jarqprog.artapi.domain.vo.Resource
 import com.jarqprog.artapi.domain.vo.User
-import java.time.Instant
 
-const val INITIAL_VERSION: Int = -1
+import java.time.Instant
 
 class ArtAggregate private constructor(
         private val identifier: Identifier,
@@ -74,14 +70,16 @@ class ArtAggregate private constructor(
 
     companion object Factory {
 
+        const val INITIAL_VERSION: Int = -1
+
         fun initialState(identifier: Identifier): ArtAggregate {
             return ArtAggregate(
                     identifier,
                     INITIAL_VERSION,
                     Instant.MIN,
                     Author(),
-                    Resource(UNDEFINED),
-                    User(UNKNOWN),
+                    Resource(),
+                    User(),
                     ArtGenre.UNDEFINED,
                     ArtStatus.UNDER_CREATION
             )
