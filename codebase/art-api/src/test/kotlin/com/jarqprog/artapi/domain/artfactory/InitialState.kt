@@ -2,6 +2,7 @@ package com.jarqprog.artapi.domain.artfactory
 
 import com.jarqprog.artapi.domain.ANY_IDENTIFIER
 import com.jarqprog.artapi.domain.ArtAggregate
+import com.jarqprog.artapi.domain.INITIAL_VERSION
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -22,7 +23,7 @@ internal class InitialState {
     @DisplayName("initialized state should have version -1")
     fun initializedStateVersion() {
 
-        val expectedVersion = -1
+        val expectedVersion = INITIAL_VERSION
         val initialState = ArtAggregate.initialState(ANY_IDENTIFIER)
 
         assertEquals(expectedVersion, initialState.version())

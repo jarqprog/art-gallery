@@ -3,7 +3,7 @@ package com.jarqprog.artapi.command.api.commanddispatching
 import com.jarqprog.artapi.domain.EVENT_ART_CREATED
 import com.jarqprog.artapi.command.api.commandvalidation.CommandValidator
 import com.jarqprog.artapi.domain.*
-import com.jarqprog.artapi.command.api.commands.CreateArt
+import com.jarqprog.artapi.domain.commands.CreateArt
 import com.jarqprog.artapi.domain.events.ArtCreated
 import com.jarqprog.artapi.command.api.exceptions.CommandProcessingFailure
 import org.junit.jupiter.api.*
@@ -25,9 +25,9 @@ internal class ArtCreation {
     @Test
     fun shouldCreateCorrectEvent() {
 
-        val optionalEvent = handler.dispatch(command, ArtHistory.initialize(command.artId)).toOption()
+        val optionalEvent = handler.dispatch(command, ArtHistory.initialize(command.artId)).blockOptional()
 
-        assertTrue(optionalEvent.nonEmpty())
+        assertTrue(optionalEvent.isPresent)
         optionalEvent
                 .map { event -> event as ArtCreated }
                 .map { event -> assertArtCreatedEventsEquals(EVENT_ART_CREATED, event) }
@@ -37,9 +37,9 @@ internal class ArtCreation {
     fun shouldCreateEventWithoutProvidingUuidAndAuthor() {
 
         val command = CreateArt(resource = EVENT_ART_CREATED.resource(), addedBy = EVENT_ART_CREATED.addedBy())
-        val optionalEvent = handler.dispatch(command, ArtHistory.initialize(command.artId)).toOption()
+        val optionalEvent = handler.dispatch(command, ArtHistory.initialize(command.artId)).blockOptional()
 
-        assertTrue(optionalEvent.nonEmpty())
+        assertTrue(optionalEvent.isPresent)
         optionalEvent
                 .map { event -> event as ArtCreated }
                 .map { event ->
@@ -57,10 +57,8 @@ internal class ArtCreation {
     @Test
     fun shouldReturnExceptionOnNotEmptyHistory() {
 
-        val errorOrEvent = handler.dispatch(command, ArtHistory.withEvents(listOf(EVENT_ART_CREATED)))
+        val shouldBeError = handler.dispatch(command, ArtHistory.withEvents(listOf(EVENT_ART_CREATED)))
 
-        assertTrue(errorOrEvent.isLeft())
-        errorOrEvent
-                .mapLeft { failure -> assertEquals(CommandProcessingFailure::class.java, failure::class.java) }
+        assertThrows<CommandProcessingFailure>("Should throw command processing failure") { shouldBeError.block() }
     }
 }

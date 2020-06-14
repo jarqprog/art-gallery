@@ -1,14 +1,13 @@
 package com.jarqprog.artapi.command.ports.outgoing.eventstore
 
-import arrow.core.getOrHandle
-import com.jarqprog.artapi.domain.HISTORY_WITH_THREE_EVENTS
-import com.jarqprog.artapi.domain.NOT_USED_HISTORY_ID
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.dao.inmemory.InMemoryEventStreamDatabase
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.dao.inmemory.InMemorySnapshotDatabase
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Assertions.fail
+import com.jarqprog.artapi.domain.*
+import com.jarqprog.artapi.domain.HISTORY_WITH_THREE_EVENTS
+import com.jarqprog.artapi.domain.NOT_USED_HISTORY_ID
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import reactor.test.StepVerifier
 import java.util.concurrent.ConcurrentHashMap
 
 internal class LoadingEvents {
@@ -25,60 +24,92 @@ internal class LoadingEvents {
         eventStore = EventStorage(eventStreamDatabase, snapshotDatabase)
 
         HISTORY_WITH_THREE_EVENTS.events().plus(ANOTHER_HISTORY.events())
-                .forEach { event -> eventStore.save(event) }
+                .forEach { event -> eventStore.save(event).subscribe() }
     }
 
     @Test
-    fun shouldNotLoadNotExistingHistory() {
+    fun `should return empty result on loading not existing history`() {
 
-        eventStore.load(NOT_USED_HISTORY_ID)
-                .map { shouldBeEmpty -> assertTrue(shouldBeEmpty.isEmpty) }
-                .getOrHandle { fail("has failure") }
+        // given
+        val notExistingHistoryId = NOT_USED_HISTORY_ID
+
+        // when
+        val result = eventStore.load(notExistingHistoryId)
+
+        // then
+        StepVerifier.create(result)
+                .verifyComplete()
     }
 
     @Test
-    fun shouldLoadAllHistories() {
+    fun `should load all histories with proper values`() {
 
-        eventStore.load(HISTORY_WITH_THREE_EVENTS.artId())
-                .map { optionalHistory ->
-                    optionalHistory
-                            .map { history -> assertHistoriesAreTheSame(history, HISTORY_WITH_THREE_EVENTS) }
-                            .orElseGet { fail("was empty") }
-                }
-                .getOrHandle { fail("has failure") }
+        // given
+        val firstHistoryId = HISTORY_WITH_THREE_EVENTS.artId()
+        val secondHistoryId = ANOTHER_HISTORY.artId()
 
-        eventStore.load(ANOTHER_HISTORY.artId())
-                .map { optionalHistory ->
-                    optionalHistory
-                            .map { history -> assertHistoriesAreTheSame(history, ANOTHER_HISTORY) }
-                            .orElseGet { fail("was empty") }
-                }
-                .getOrHandle { fail("has failure") }
+        // when
+        val firstResult = eventStore.load(firstHistoryId)
+        val secondResult = eventStore.load(secondHistoryId)
+
+        // then
+        StepVerifier.create(firstResult)
+                .expectNext(HISTORY_WITH_THREE_EVENTS)
+                .verifyComplete()
+
+        StepVerifier.create(secondResult)
+                .expectNext(ANOTHER_HISTORY)
+                .verifyComplete()
     }
 
     @Test
-    fun shouldLoadAllEventsFromGivenPointInThePast() {
+    fun `should load history for given point in time`() {
 
-        val identifier = ANOTHER_HISTORY.artId()
+        // given
+        val historyId = HISTORY_WITH_THREE_EVENTS.artId()
+        val eventToExclude = HISTORY_WITH_THREE_EVENTS.events().last()
+        val pointInTime = eventToExclude.timestamp().minusSeconds(1)
+        val expectedHistory = ArtHistory.withEvents(HISTORY_WITH_THREE_EVENTS.events().minusElement(eventToExclude))
 
-        val firstPointInTime = ANOTHER_HISTORY.events().first().timestamp().plusSeconds(1)
-        val firstExpectedHistory = filterHistoryByPointInTime(ANOTHER_HISTORY, firstPointInTime)
-        eventStore.load(identifier, firstPointInTime)
-                .map { optionalHistory ->
-                    optionalHistory
-                            .map { history -> assertHistoriesAreTheSame(history, firstExpectedHistory) }
-                            .orElseGet { fail("was empty") }
-                }
-                .getOrHandle { fail("has failure") }
+        // when
+        val result = eventStore.load(historyId, pointInTime)
 
-        val secondPointInTime = ANOTHER_HISTORY.events().last().timestamp().minusSeconds(1)
-        val secondExpectedHistory = filterHistoryByPointInTime(ANOTHER_HISTORY, secondPointInTime)
-        eventStore.load(identifier, secondPointInTime)
-                .map { optionalHistory ->
-                    optionalHistory
-                            .map { history -> assertHistoriesAreTheSame(history, secondExpectedHistory) }
-                            .orElseGet { fail("was empty") }
-                }
-                .getOrHandle { fail("has failure") }
+        // then
+        StepVerifier.create(result)
+                .expectNext(expectedHistory)
+                .verifyComplete()
+    }
+
+    @Test
+    fun `should load history with all events when passed future point in time`() {
+
+        // given
+        val historyId = HISTORY_WITH_THREE_EVENTS.artId()
+        val pointInTime = HISTORY_WITH_THREE_EVENTS.events().last().timestamp().plusSeconds(3600)
+
+        // when
+        val result = eventStore.load(historyId, pointInTime)
+
+        // then
+        StepVerifier.create(result)
+                .expectNext(HISTORY_WITH_THREE_EVENTS)
+                .verifyComplete()
+    }
+
+    @Test
+    fun `should load empty history when passed point in time earlier then first event timestamp`() {
+
+        // given
+        val historyId = HISTORY_WITH_THREE_EVENTS.artId()
+        val pointInTime = HISTORY_WITH_THREE_EVENTS.events().first().timestamp().minusSeconds(3600)
+        val expected = ArtHistory.initialize(historyId)
+
+        // when
+        val result = eventStore.load(historyId, pointInTime)
+
+        // then
+        StepVerifier.create(result)
+                .expectNext(expected)
+                .verifyComplete()
     }
 }

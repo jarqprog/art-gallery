@@ -1,12 +1,12 @@
 package com.jarqprog.artapi.command.api
 
-import arrow.core.Either
-import com.jarqprog.artapi.command.api.commands.ArtCommand
+import com.jarqprog.artapi.domain.commands.ArtCommand
 import com.jarqprog.artapi.domain.events.ArtEvent
 import com.jarqprog.artapi.domain.ArtHistory
+import reactor.core.publisher.Mono
 
 interface CommandDispatching {
 
-    fun dispatch(command: ArtCommand, history: ArtHistory): Either<Throwable, ArtEvent>
+    fun dispatch(command: ArtCommand, history: ArtHistory): Mono<ArtEvent>
 
 }

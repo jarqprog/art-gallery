@@ -6,8 +6,7 @@ import java.time.Instant
 import java.util.stream.Collectors
 import kotlin.Comparator
 
-
-class ArtHistory private constructor (
+class ArtHistory private constructor(
 
         private val artId: Identifier,
         private val snapshot: ArtAggregate,
@@ -60,5 +59,23 @@ class ArtHistory private constructor (
             true -> snapshot.timestamp()
             else -> history.last().timestamp()
         }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ArtHistory) return false
+
+        if (artId != other.artId) return false
+        if (version != other.version) return false
+        if (timestamp != other.timestamp) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = artId.hashCode()
+        result = 31 * result + version
+        result = 31 * result + timestamp.hashCode()
+        return result
     }
 }

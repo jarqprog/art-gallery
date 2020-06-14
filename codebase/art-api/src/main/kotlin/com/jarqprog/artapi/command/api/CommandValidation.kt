@@ -1,14 +1,13 @@
 package com.jarqprog.artapi.command.api
 
-import arrow.core.Either
-import com.jarqprog.artapi.command.api.commands.ArtCommand
-import com.jarqprog.artapi.command.api.exceptions.CommandProcessingFailure
+import com.jarqprog.artapi.domain.commands.ArtCommand
 import com.jarqprog.artapi.domain.ArtAggregate
 import com.jarqprog.artapi.domain.ArtHistory
+import reactor.core.publisher.Mono
 
 interface CommandValidation {
 
     fun validate(command: ArtCommand, history: ArtHistory, currentState: ArtAggregate):
-            Either<CommandProcessingFailure, ArtCommand>
+            Mono<ArtCommand>
 
 }

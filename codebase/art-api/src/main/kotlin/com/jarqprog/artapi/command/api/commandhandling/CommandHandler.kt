@@ -1,15 +1,15 @@
 package com.jarqprog.artapi.command.api.commandhandling
 
 
-import arrow.core.getOrHandle
 import com.jarqprog.artapi.command.api.CommandDispatching
 import com.jarqprog.artapi.command.api.CommandHandling
 import com.jarqprog.artapi.command.api.EventPublishing
 import com.jarqprog.artapi.domain.*
-import com.jarqprog.artapi.command.api.commands.ArtCommand
+import com.jarqprog.artapi.domain.commands.ArtCommand
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.EventStore
+import org.slf4j.LoggerFactory
+import reactor.core.publisher.Mono
 
-import java.util.*
 
 class CommandHandler(
 
@@ -19,18 +19,14 @@ class CommandHandler(
 
 ) : CommandHandling {
 
-    override fun handle(command: ArtCommand): Optional<Throwable> {
+    private val logger = LoggerFactory.getLogger(javaClass)
+
+    override fun handle(command: ArtCommand): Mono<Void> {
         return eventStore.load(command.artId())
-                .map { optionalHistory ->
-                    optionalHistory
-                            .or { Optional.of(ArtHistory.initialize(command.artId)) }
-                            .map { history -> commandDispatching.dispatch(command, history) }
-                            .flatMap { failureOrEvent ->
-                                failureOrEvent
-                                        .map(eventPublishing::publish)
-                                        .getOrHandle { failure -> Optional.of(failure) }
-                            }
-                }
-                .getOrHandle { failure -> Optional.of(failure) }
+                .doOnNext { artCommand -> logger.debug("Processing $artCommand") }
+                .switchIfEmpty(Mono.just(ArtHistory.initialize(command.artId)))
+                .doOnNext { history -> logger.debug("Found history $history") }
+                .flatMap { history -> commandDispatching.dispatch(command, history) }
+                .flatMap(eventPublishing::publish)
     }
 }

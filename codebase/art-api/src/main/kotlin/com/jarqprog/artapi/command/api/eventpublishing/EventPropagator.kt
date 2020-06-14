@@ -2,30 +2,18 @@ package com.jarqprog.artapi.command.api.eventpublishing
 
 import com.jarqprog.artapi.command.api.EventPublishing
 import com.jarqprog.artapi.domain.events.ArtEvent
-import com.jarqprog.artapi.command.api.exceptions.EventProcessingFailure
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.EventStore
-import com.jarqprog.artapi.command.ports.outgoing.projection.ProjectionHandling
 import org.slf4j.LoggerFactory
-import java.util.*
+import reactor.core.publisher.Mono
 
 class EventPropagator(
-        private val eventStorage: EventStore,
-        private val projectionHandling: ProjectionHandling
+        private val eventStorage: EventStore
 ) : EventPublishing {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    override fun publish(event: ArtEvent): Optional<EventProcessingFailure> {
+    override fun publish(event: ArtEvent): Mono<Void> {
         return eventStorage.save(event)
-                .let { optionalFailure ->
-                    optionalFailure
-                            .map { failure -> EventProcessingFailure.fromThrowable(failure) }
-                            .or {
-                                projectionHandling.handle(event.artId())
-                                        .map { failure -> handleProjectionUpdateFailure(event, failure) }
-                                Optional.empty()
-                            }
-                }
     }
 
     private fun handleProjectionUpdateFailure(event: ArtEvent, failure: Throwable) {

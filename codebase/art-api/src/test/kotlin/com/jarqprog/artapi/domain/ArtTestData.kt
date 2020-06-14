@@ -1,17 +1,13 @@
 package com.jarqprog.artapi.domain
 
 import com.jarqprog.artapi.domain.events.ArtCreated
-import com.jarqprog.artapi.domain.events.ArtEvent
 import com.jarqprog.artapi.domain.events.ResourceChanged
 import com.jarqprog.artapi.domain.vo.Author
 import com.jarqprog.artapi.domain.vo.Identifier
 import com.jarqprog.artapi.domain.vo.Resource
 import com.jarqprog.artapi.domain.vo.User
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.assertAll
+
 import java.time.Instant
-import java.util.Comparator
 
 internal val ANY_IDENTIFIER: Identifier = Identifier("2aa41ef2-11cc-427f-aa7a-98158b9435fd")
 internal val ANY_OTHER_IDENTIFIER: Identifier = Identifier("2aa41ef2-11cc-427f-aa7a-98158b94356a")
@@ -118,53 +114,43 @@ internal val EXPECTED_STATE_VERSION_2 = TestArt(
         EVENT_ART_CREATED.artStatus()
 )
 
-internal fun assertStatesEquals(expected: TestArt, replayed: ArtAggregate) {
+internal val ANOTHER_EVENT_ART_CREATED = ArtCreated(
+        ANY_OTHER_IDENTIFIER,
+        0,
+        TIME_NOW.minusSeconds(1200),
+        AUTHOR_MARIA,
+        ANY_RESOURCE,
+        USER_MARIA,
+        ArtGenre.UNDEFINED,
+        ArtStatus.ACTIVE
+)
 
-    assertAll("art states should be equal",
-            { assertEquals(expected.identifier, replayed.identifier()) },
-            { assertEquals(expected.version, replayed.version()) },
-            { assertEquals(expected.timestamp, replayed.timestamp()) },
-            { assertEquals(expected.author, replayed.author()) },
-            { assertEquals(expected.resource, replayed.resource()) },
-            { assertEquals(expected.addedBy, replayed.addedBy()) },
-            { assertEquals(expected.genre, replayed.genre()) },
-            { assertEquals(expected.status, replayed.status()) }
-    )
-}
+internal val ANOTHER_EVENT_RESOURCE_URL_CHANGED_V1 = ResourceChanged(
+        ANY_OTHER_IDENTIFIER,
+        1,
+        TIME_NOW.minusSeconds(600),
+        ANY_RESOURCE_WITH_LONG_PATH
+)
 
-internal fun assertStatesEquals(expected: ArtAggregate, replayed: ArtAggregate) {
+internal val ANOTHER_EVENT_RESOURCE_URL_CHANGED_V2 = ResourceChanged(
+        ANY_OTHER_IDENTIFIER,
+        2,
+        TIME_NOW.minusSeconds(120),
+        ANY_OTHER_RESOURCE
+)
 
-    assertAll("art states should be equal",
-            { assertEquals(expected.identifier(), replayed.identifier()) },
-            { assertEquals(expected.version(), replayed.version()) },
-            { assertEquals(expected.timestamp(), replayed.timestamp()) },
-            { assertEquals(expected.author(), replayed.author()) },
-            { assertEquals(expected.resource(), replayed.resource()) },
-            { assertEquals(expected.addedBy(), replayed.addedBy()) },
-            { assertEquals(expected.genre(), replayed.genre()) },
-            { assertEquals(expected.status(), replayed.status()) }
-    )
-}
+internal val ANOTHER_EVENT_RESOURCE_URL_CHANGED_V3 = ResourceChanged(
+        ANY_OTHER_IDENTIFIER,
+        3,
+        TIME_NOW,
+        ANY_OTHER_RESOURCE
+)
 
-internal fun assertArtAndHistoryValuesMatch(art: ArtAggregate, history: ArtHistory) {
-
-    assertAll("art and history values should match",
-            { assertEquals(art.identifier(), history.artId()) },
-            { assertEquals(art.version(), history.version()) },
-            { assertEquals(art.timestamp(), history.timestamp()) }
-    )
-}
-
-internal fun assertHistoryAndEventsValuesMatch(events: List<ArtEvent>, history: ArtHistory) {
-
-    val latestEvent = events.sortedWith(Comparator.comparing(ArtEvent::timestamp)).last()
-
-    assertAll("history and event values should match",
-            { assertEquals(latestEvent.artId(), history.artId()) },
-            { assertEquals(latestEvent.version(), history.version()) },
-            { assertEquals(latestEvent.timestamp(), history.timestamp()) },
-            { Assertions.assertArrayEquals(events.toTypedArray(), history.events().toTypedArray()) }
-    )
-}
-
-
+internal val ANOTHER_HISTORY = ArtHistory.withEvents(
+        listOf(
+                ANOTHER_EVENT_ART_CREATED,
+                ANOTHER_EVENT_RESOURCE_URL_CHANGED_V1,
+                ANOTHER_EVENT_RESOURCE_URL_CHANGED_V2,
+                ANOTHER_EVENT_RESOURCE_URL_CHANGED_V3
+        )
+)

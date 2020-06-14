@@ -1,14 +1,14 @@
 package com.jarqprog.artapi.command.ports.outgoing.eventstore
 
+import com.jarqprog.artapi.command.ports.outgoing.eventstore.entity.EventDescriptor
 import com.jarqprog.artapi.domain.vo.Identifier
-import com.jarqprog.artapi.command.ports.outgoing.eventstore.entity.ArtHistoryDescriptor
-import java.util.*
+import reactor.core.publisher.Mono
 
 interface EventStreamDatabase {
 
-    fun historyExistsById(artId: Identifier): Boolean
-    fun streamVersion(artId: Identifier): Optional<Int>
-    fun save(eventStream: ArtHistoryDescriptor)
-    fun load(artId: Identifier): Optional<ArtHistoryDescriptor>
+    fun historyExistsById(artId: Identifier): Mono<Boolean>
+    fun streamVersion(artId: Identifier): Mono<Int>
+    fun save(event: EventDescriptor): Mono<Void>
+    fun load(artId: Identifier): Mono<List<EventDescriptor>>
 
 }

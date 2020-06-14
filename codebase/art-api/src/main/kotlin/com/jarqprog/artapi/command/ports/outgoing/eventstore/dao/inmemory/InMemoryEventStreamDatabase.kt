@@ -2,28 +2,37 @@ package com.jarqprog.artapi.command.ports.outgoing.eventstore.dao.inmemory
 
 import com.jarqprog.artapi.domain.vo.Identifier
 import com.jarqprog.artapi.command.ports.outgoing.eventstore.EventStreamDatabase
-import com.jarqprog.artapi.command.ports.outgoing.eventstore.entity.ArtHistoryDescriptor
-import org.slf4j.LoggerFactory
-
+import com.jarqprog.artapi.command.ports.outgoing.eventstore.entity.EventDescriptor
+import reactor.core.publisher.Mono
 import java.util.*
+
 import java.util.concurrent.ConcurrentHashMap
 
-class InMemoryEventStreamDatabase(private val memory: ConcurrentHashMap<String, ArtHistoryDescriptor>) : EventStreamDatabase {
+class InMemoryEventStreamDatabase(private val memory: ConcurrentHashMap<UUID, MutableList<EventDescriptor>>)
+    : EventStreamDatabase {
 
-    private val logger = LoggerFactory.getLogger(javaClass)
+    override fun historyExistsById(artId: Identifier): Mono<Boolean> = Mono
+            .just(memory[artId.uuid()] != null)
 
-    override fun historyExistsById(artId: Identifier): Boolean {
-        return memory[artId.value] != null
+    override fun streamVersion(artId: Identifier): Mono<Int> {
+        return Mono.fromCallable<MutableList<EventDescriptor>> { memory[artId.uuid()] }
+                .map { events -> events.last() }
+                .map(EventDescriptor::version)
     }
 
-    override fun streamVersion(artId: Identifier): Optional<Int> {
-        return Optional.ofNullable(memory[artId.value])
-                .map(ArtHistoryDescriptor::version)
-    }
+    override fun save(event: EventDescriptor): Mono<Void> = Mono
+                .fromCallable<MutableList<EventDescriptor>> { memory[event.artId] }
+                .switchIfEmpty(
+                    Mono.just(mutableListOf<EventDescriptor>())
+                            .map { events ->
+                                memory[event.artId] = events
+                                events
+                            }
+                )
+                .map { events -> events.add(event) }
+                .then()
 
-    override fun save(eventStream: ArtHistoryDescriptor) {
-        memory[eventStream.artId] = eventStream
-    }
 
-    override fun load(artId: Identifier): Optional<ArtHistoryDescriptor> = Optional.ofNullable(memory[artId.value])
+    override fun load(artId: Identifier): Mono<List<EventDescriptor>> = Mono.fromCallable { memory[artId.uuid()] }
+
 }

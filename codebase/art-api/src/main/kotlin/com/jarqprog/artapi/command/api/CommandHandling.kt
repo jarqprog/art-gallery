@@ -1,10 +1,10 @@
 package com.jarqprog.artapi.command.api
 
-import com.jarqprog.artapi.command.api.commands.ArtCommand
-import java.util.*
+import com.jarqprog.artapi.domain.commands.ArtCommand
+import reactor.core.publisher.Mono
 
 interface CommandHandling {
 
-    fun handle(command: ArtCommand): Optional<Throwable>
+    fun handle(command: ArtCommand): Mono<Void>
 
 }

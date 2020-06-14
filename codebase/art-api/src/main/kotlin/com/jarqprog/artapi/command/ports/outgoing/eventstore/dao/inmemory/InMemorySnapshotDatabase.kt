@@ -18,7 +18,8 @@ class InMemorySnapshotDatabase(private val memory: ConcurrentHashMap<String, Mut
 
     override fun loadLatest(artId: Identifier): Optional<Snapshot> {
         return Optional.ofNullable(memory[artId.value])
-                .map { snapshots -> snapshots
+                .map { snapshots ->
+                    snapshots
                             .sortedWith(Comparator.comparing(Snapshot::timestamp))
                             .last()
                 }

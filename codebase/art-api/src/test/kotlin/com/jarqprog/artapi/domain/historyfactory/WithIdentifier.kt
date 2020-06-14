@@ -2,6 +2,7 @@ package com.jarqprog.artapi.domain.historyfactory
 
 import com.jarqprog.artapi.domain.ANY_IDENTIFIER
 import com.jarqprog.artapi.domain.ArtHistory
+import com.jarqprog.artapi.domain.INITIAL_VERSION
 import com.jarqprog.artapi.domain.events.ArtEvent
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -14,7 +15,7 @@ internal class WithIdentifier {
     fun initializedHistoryShouldHaveProperValues() {
 
         val history = ArtHistory.initialize(ANY_IDENTIFIER)
-        val expectedVersion = -1
+        val expectedVersion = INITIAL_VERSION
         val expectedTimestamp = Instant.MIN
         val expectedEvents = emptyList<ArtEvent>()
 

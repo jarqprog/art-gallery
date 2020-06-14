@@ -13,6 +13,8 @@ import com.jarqprog.artapi.domain.vo.Resource
 import com.jarqprog.artapi.domain.vo.User
 import java.time.Instant
 
+const val INITIAL_VERSION: Int = -1
+
 class ArtAggregate private constructor(
         private val identifier: Identifier,
         private val version: Int,
@@ -75,7 +77,7 @@ class ArtAggregate private constructor(
         fun initialState(identifier: Identifier): ArtAggregate {
             return ArtAggregate(
                     identifier,
-                    -1,
+                    INITIAL_VERSION,
                     Instant.MIN,
                     Author(),
                     Resource(UNDEFINED),

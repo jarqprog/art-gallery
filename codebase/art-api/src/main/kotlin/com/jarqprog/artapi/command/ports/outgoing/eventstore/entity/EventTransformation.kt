@@ -8,12 +8,12 @@ import com.jarqprog.artapi.command.ports.outgoing.eventstore.exceptions.EventSto
 import java.util.*
 import java.util.function.Function
 
-class ToDescriptor : Function<ArtEvent, ArtEventDescriptor> {
+class ToDescriptor : Function<ArtEvent, EventDescriptor> {
 
-    override fun apply(event: ArtEvent): ArtEventDescriptor {
-        return ArtEventDescriptor(
+    override fun apply(event: ArtEvent): EventDescriptor {
+        return EventDescriptor(
                 UUID.randomUUID(),
-                event.artId().value,
+                event.artId().uuid(),
                 event.version(),
                 event.timestamp(),
                 event.type(),
@@ -23,9 +23,9 @@ class ToDescriptor : Function<ArtEvent, ArtEventDescriptor> {
     }
 }
 
-class ToEvent : Function<ArtEventDescriptor, ArtEvent> {
+class ToEvent : Function<EventDescriptor, ArtEvent> {
 
-    override fun apply(descriptor: ArtEventDescriptor): ArtEvent {
+    override fun apply(descriptor: EventDescriptor): ArtEvent {
         val payload = descriptor.payload
         return when (descriptor.name) {
             ArtCreated::class.java.simpleName -> MAPPER.readValue(payload, ArtCreated::class.java)
@@ -34,7 +34,7 @@ class ToEvent : Function<ArtEventDescriptor, ArtEvent> {
         }
     }
 
-    private fun raiseFailure(descriptor: ArtEventDescriptor): Nothing {
+    private fun raiseFailure(descriptor: EventDescriptor): Nothing {
         throw EventStoreFailure("error while retrieving data for $descriptor")
     }
 }

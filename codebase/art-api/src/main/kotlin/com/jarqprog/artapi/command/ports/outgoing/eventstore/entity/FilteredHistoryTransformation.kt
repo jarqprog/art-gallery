@@ -1,22 +1,24 @@
 package com.jarqprog.artapi.command.ports.outgoing.eventstore.entity
 
 import com.jarqprog.artapi.domain.ArtHistory
+import com.jarqprog.artapi.domain.vo.Identifier
 import java.time.Instant
-import java.util.function.BiFunction
 import java.util.stream.Collectors
 
-class FilteredHistoryTransformation : BiFunction<ArtHistoryDescriptor, Instant, ArtHistory> {
+class FilteredHistoryTransformation {
 
     private val descriptorToEvent = ToEvent()
 
-    override fun apply(historyDescriptor: ArtHistoryDescriptor, stateAt: Instant): ArtHistory {
+    fun asHistory(artId: Identifier, events: List<EventDescriptor>, stateAt: Instant): ArtHistory {
 
-        val history = historyDescriptor.events()
-                .stream()
+        val history = events.stream()
                 .filter { eventDescriptor -> eventDescriptor.isNotLaterThan(stateAt) }
                 .map(descriptorToEvent)
                 .collect(Collectors.toList())
 
-        return ArtHistory.withEvents(history)
+        return when(history.isEmpty()) {
+            true -> ArtHistory.initialize(artId)
+            else -> ArtHistory.withEvents(history)
+        }
     }
 }

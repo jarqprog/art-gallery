@@ -5,8 +5,6 @@ import com.jarqprog.artapi.domain.ArtAggregate
 import java.util.*
 import java.util.function.Function
 
-
-
 class SnapshotCreation : Function<ArtAggregate, Snapshot> {
 
     override fun apply(art: ArtAggregate): Snapshot {
