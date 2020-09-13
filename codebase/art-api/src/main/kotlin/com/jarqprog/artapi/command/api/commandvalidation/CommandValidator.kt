@@ -43,30 +43,32 @@ class CommandValidator : CommandValidation {
             command
         }
     }
-}
 
-private fun validateArtIdEquality(command: ArtCommand, currentState: ArtAggregate) {
-    val commandArtUuid = command.artId()
-    val artUuid = currentState.identifier()
-    raiseFailureIf(commandArtUuid != artUuid,
-            "invalid art identifier for $command, expected id: $artUuid")
-}
+    companion object {
+        private fun validateArtIdEquality(command: ArtCommand, currentState: ArtAggregate) {
+            val commandArtUuid = command.artId()
+            val artUuid = currentState.identifier()
+            raiseFailureIf(commandArtUuid != artUuid,
+                    "invalid art identifier for $command, expected id: $artUuid")
+        }
 
-private fun validateCommandVersionOnUpdate(command: ArtCommand, currentState: ArtAggregate) {
-    val expectedVersion = currentState.version()
-    raiseFailureIf(command.version() != expectedVersion,
-            "invalid version for $command, expected version: $expectedVersion")
-}
+        private fun validateCommandVersionOnUpdate(command: ArtCommand, currentState: ArtAggregate) {
+            val expectedVersion = currentState.version()
+            raiseFailureIf(command.version() != expectedVersion,
+                    "invalid version for $command, expected version: $expectedVersion")
+        }
 
-private fun validateHistory(command: ArtCommand, history: ArtHistory) {
-    when (command) {
-        is CreateArt -> raiseFailureIf(history.isNotEmpty(),
-                "error on processing $command - history is not empty")
-        else -> raiseFailureIf(history.isEmpty(),
-                "error on processing $command - history is empty")
+        private fun validateHistory(command: ArtCommand, history: ArtHistory) {
+            when (command) {
+                is CreateArt -> raiseFailureIf(history.isNotEmpty(),
+                        "error on processing $command - history is not empty")
+                else -> raiseFailureIf(history.isEmpty(),
+                        "error on processing $command - history is empty")
+            }
+        }
+
+        private fun raiseFailureIf(isTrue: Boolean, withMessage: String) {
+            if (isTrue) throw CommandProcessingFailure(withMessage)
+        }
     }
-}
-
-private fun raiseFailureIf(isTrue: Boolean, withMessage: String) {
-    if (isTrue) throw CommandProcessingFailure(withMessage)
 }
