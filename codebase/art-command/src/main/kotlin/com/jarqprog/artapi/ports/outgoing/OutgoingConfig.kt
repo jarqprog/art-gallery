@@ -7,6 +7,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.jarqprog.artapi.ports.outgoing.eventstore.EventStorage
 import com.jarqprog.artapi.ports.outgoing.eventstore.EventStore
 import com.jarqprog.artapi.ports.outgoing.eventstore.EventStreamDatabase
+import com.jarqprog.artapi.ports.outgoing.eventstore.dao.inmemory.InMemoryEventStreamDatabase
 import com.jarqprog.artapi.ports.outgoing.eventstore.dao.inmemory.InMemorySnapshotDatabase
 
 import org.springframework.context.annotation.Bean
@@ -22,7 +23,10 @@ class OutgoingConfig {
 
     @Bean
     fun eventStore(eventStreamPostgres: EventStreamDatabase): EventStore {
-        return EventStorage(eventStreamPostgres, InMemorySnapshotDatabase(ConcurrentHashMap()))
+        return EventStorage(
+                InMemoryEventStreamDatabase(ConcurrentHashMap()),
+                InMemorySnapshotDatabase(ConcurrentHashMap())
+        )
     }
 
 

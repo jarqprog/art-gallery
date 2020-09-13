@@ -2,13 +2,13 @@ package com.jarqprog.artapi.domain.replaying
 
 import com.jarqprog.artapi.domain.ArtAggregate
 import com.jarqprog.artapi.domain.ArtHistory
-import com.jarqprog.artapi.domain.ArtAggregateSupport.EXPECTED_STATE_VERSION_2
+import com.jarqprog.artapi.domain.ArtAggregateContainer.EXPECTED_STATE_VERSION_2
 import com.jarqprog.artapi.domain.ArtTestAssertions.assertStatesEquals
-import com.jarqprog.artapi.domain.EventSupport.ONE_EVENT_LIST
-import com.jarqprog.artapi.domain.EventSupport.THREE_EVENTS_LIST
-import com.jarqprog.artapi.domain.HistorySupport.HISTORY_WITH_ONE_EVENT
-import com.jarqprog.artapi.domain.HistorySupport.HISTORY_WITH_THREE_EVENTS
-import com.jarqprog.artapi.domain.HistorySupport.HISTORY_WITH_TWO_EVENTS
+import com.jarqprog.artapi.domain.EventContainer.ONE_EVENT_LIST
+import com.jarqprog.artapi.domain.EventContainer.THREE_EVENTS_LIST
+import com.jarqprog.artapi.domain.HistoryContainer.HISTORY_WITH_ONE_EVENT
+import com.jarqprog.artapi.domain.HistoryContainer.HISTORY_WITH_THREE_EVENTS
+import com.jarqprog.artapi.domain.HistoryContainer.HISTORY_WITH_TWO_EVENTS
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 

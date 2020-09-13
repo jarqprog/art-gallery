@@ -1,8 +1,8 @@
 package com.jarqprog.artapi.ports.incoming.web
 
-import com.jarqprog.artapi.applicationservice.handler.exceptions.CommandProcessingFailure
-import com.jarqprog.artapi.applicationservice.handler.exceptions.IncorrectVersion
-import com.jarqprog.artapi.applicationservice.handler.exceptions.NotFound
+import com.jarqprog.artapi.applicationservice.exceptions.CommandProcessingFailure
+import com.jarqprog.artapi.applicationservice.exceptions.IncorrectVersion
+import com.jarqprog.artapi.applicationservice.exceptions.NotFound
 import org.springframework.http.ResponseEntity
 import reactor.core.publisher.Mono
 import java.util.function.Function

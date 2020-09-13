@@ -1,8 +1,8 @@
 package com.jarqprog.artapi.ports.incoming.web
 
-import com.jarqprog.artapi.applicationservice.handler.CommandHandling
-import com.jarqprog.artapi.applicationservice.handler.commands.ChangeResource
-import com.jarqprog.artapi.applicationservice.handler.commands.CreateArt
+import com.jarqprog.artapi.applicationservice.CommandHandling
+import com.jarqprog.artapi.applicationservice.commands.ChangeResource
+import com.jarqprog.artapi.applicationservice.commands.CreateArt
 import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*

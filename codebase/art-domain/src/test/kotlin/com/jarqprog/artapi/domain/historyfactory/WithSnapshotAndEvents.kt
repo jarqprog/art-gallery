@@ -1,11 +1,11 @@
 package com.jarqprog.artapi.domain.historyfactory
 
 import com.jarqprog.artapi.domain.ArtHistory
-import com.jarqprog.artapi.domain.ArtAggregateSupport.SNAPSHOT_V2
+import com.jarqprog.artapi.domain.ArtAggregateContainer.SNAPSHOT_V2
 import com.jarqprog.artapi.domain.ArtTestAssertions.assertHistoryAndEventsValuesMatch
 import com.jarqprog.artapi.domain.ArtTestAssertions.assertStatesEquals
-import com.jarqprog.artapi.domain.EventSupport.EVENTS_V_3_4_5
-import com.jarqprog.artapi.domain.EventSupport.THREE_EVENTS_LIST
+import com.jarqprog.artapi.domain.EventContainer.EVENTS_V_3_4_5
+import com.jarqprog.artapi.domain.EventContainer.THREE_EVENTS_LIST
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 

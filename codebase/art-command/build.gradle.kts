@@ -3,7 +3,7 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
     java
-    id("org.springframework.boot")
+    id("org.springframework.boot") version "2.3.0.RELEASE"
     id("io.spring.dependency-management")
     kotlin("jvm")
     kotlin("plugin.spring")
@@ -28,6 +28,7 @@ dependencies {
     testImplementation("io.projectreactor:reactor-test")
 
     implementation(project(":art-domain"))
+    testImplementation(project(":art-test-support"))
 
 }
 tasks.withType<Test> {
