@@ -1,2 +1,2 @@
 rootProject.name = "art-gallery"
-include("art-api")
+include("art-command", "art-domain")
