@@ -1,0 +1,18 @@
+spring:
+  main:
+    web-application-type: reactive
+  r2dbc:
+    url: r2dbc:postgresql://xbwfxhqy:e0MXV1IHzzp-tbchmL7Ukv5Hk55R3KcH@kandula.db.elephantsql.com:5432/xbwfxhqy
+    pool:
+      initial-size: 3
+      max-size: 4
+logging:
+  level:
+    root: INFO
+    com:
+      jarqprog:
+        artapi: DEBUG
+    org:
+      springframework:
+        data:
+          r2dbc: DEBUG
