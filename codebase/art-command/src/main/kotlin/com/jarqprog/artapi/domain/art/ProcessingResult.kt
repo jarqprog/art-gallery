@@ -1,6 +1,5 @@
-package com.jarqprog.artapi.applicationservice
+package com.jarqprog.artapi.domain.art
 
-import com.jarqprog.artapi.domain.art.ArtAggregate
 import com.jarqprog.artapi.domain.events.ArtEvent
 import com.jarqprog.artapi.domain.vo.Identifier
 

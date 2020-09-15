@@ -1,6 +1,6 @@
 package com.jarqprog.artapi.applicationservice.publishing
 
-import com.jarqprog.artapi.applicationservice.ProcessingResult
+import com.jarqprog.artapi.domain.art.ProcessingResult
 import com.jarqprog.artapi.domain.ChangesPublishing
 import com.jarqprog.artapi.domain.events.ArtEvent
 import com.jarqprog.artapi.ports.outgoing.eventstore.EventStore

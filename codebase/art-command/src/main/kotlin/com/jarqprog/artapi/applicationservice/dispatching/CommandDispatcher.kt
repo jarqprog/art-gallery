@@ -1,6 +1,6 @@
 package com.jarqprog.artapi.applicationservice.dispatching
 
-import com.jarqprog.artapi.applicationservice.ProcessingResult
+import com.jarqprog.artapi.domain.art.ProcessingResult
 import com.jarqprog.artapi.domain.art.ArtAggregate
 import com.jarqprog.artapi.domain.CommandValidation
 import com.jarqprog.artapi.domain.art.ArtHistory

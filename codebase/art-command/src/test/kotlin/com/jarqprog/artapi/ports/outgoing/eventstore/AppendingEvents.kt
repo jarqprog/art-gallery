@@ -1,6 +1,6 @@
 package com.jarqprog.artapi.ports.outgoing.eventstore
 
-import com.jarqprog.artapi.applicationservice.ProcessingResult
+import com.jarqprog.artapi.domain.art.ProcessingResult
 import com.jarqprog.artapi.ports.outgoing.eventstore.EventStoreTestUtils.allSecondHistoryProcessingResults
 import com.jarqprog.artapi.ports.outgoing.eventstore.EventStoreTestUtils.allFirstHistoryProcessingResults
 import com.jarqprog.artapi.support.EventContainer.ANY_IDENTIFIER

@@ -1,6 +1,6 @@
 package com.jarqprog.artapi.ports.outgoing.eventstore
 
-import com.jarqprog.artapi.applicationservice.ProcessingResult
+import com.jarqprog.artapi.domain.art.ProcessingResult
 import com.jarqprog.artapi.support.EventContainer.ANOTHER_EVENT_ART_CREATED
 import com.jarqprog.artapi.support.EventContainer.ANOTHER_EVENT_RESOURCE_URL_CHANGED_V1
 import com.jarqprog.artapi.support.EventContainer.ANOTHER_EVENT_RESOURCE_URL_CHANGED_V2
