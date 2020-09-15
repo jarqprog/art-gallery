@@ -1,15 +1,16 @@
 package com.jarqprog.artapi.applicationservice.dispatching
 
-import com.jarqprog.artapi.domain.ArtHistory
-import com.jarqprog.artapi.domain.ArtStatus
+import com.jarqprog.artapi.applicationservice.ProcessingResult
+import com.jarqprog.artapi.domain.art.ArtHistory
+import com.jarqprog.artapi.domain.art.ArtStatus
 import com.jarqprog.artapi.applicationservice.validation.CommandValidator
 import com.jarqprog.artapi.applicationservice.commands.CreateArt
+import com.jarqprog.artapi.domain.art.ArtAggregate
 import com.jarqprog.artapi.domain.events.ArtCreated
-import com.jarqprog.artapi.applicationservice.exceptions.CommandProcessingFailure
-import com.jarqprog.artapi.domain.ArtGenre
-import com.jarqprog.artapi.support.CommandSupport.CREATE_ART
-import com.jarqprog.artapi.support.EventAssertions.assertArtCreatedEventsEquals
+import com.jarqprog.artapi.domain.art.ArtGenre
+import com.jarqprog.artapi.support.EventContainer
 import com.jarqprog.artapi.support.EventContainer.EVENT_ART_CREATED
+import org.assertj.core.api.Assertions.assertThat
 
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
@@ -19,42 +20,64 @@ internal class ArtCreation {
     private val handler = CommandDispatcher(CommandValidator())
 
     @Test
-    fun shouldCreateCorrectEvent() {
+    fun `should create correct event`() {
+        //given
+        val command = CreateArt(
+                EventContainer.AUTHOR_MARIA,
+                EventContainer.ANY_RESOURCE,
+                EventContainer.USER_MARIA,
+                ArtGenre.UNDEFINED,
+                ArtStatus.ACTIVE
+        )
 
-        val optionalEvent = handler.dispatch(CREATE_ART, ArtHistory.initialize(CREATE_ART.artId)).blockOptional()
+        val initializedHistory = ArtHistory.with(command.artId)
 
-        assertTrue(optionalEvent.isPresent)
-        optionalEvent
-                .map { event -> event as ArtCreated }
-                .map { event -> assertArtCreatedEventsEquals(EVENT_ART_CREATED, event) }
+        val expectedEvent = ArtCreated(
+                command.artId,
+                command.version(),
+                command.timestamp(),
+                command.author(),
+                command.resource(),
+                command.addedBy(),
+                command.artGenre(),
+                command.artStatus()
+        )
+        val expectedSnapshot = ArtAggregate.replayAll(ArtHistory.with(command.artId, listOf(expectedEvent.asDescriptor())))
+        val expectedResult = ProcessingResult(expectedEvent, expectedSnapshot)
+
+        //when
+        val optionalResult = handler.dispatch(command, initializedHistory).blockOptional()
+
+        //then
+        assertTrue(optionalResult.isPresent)
+        optionalResult
+                .map { result -> assertThat(result).isEqualTo(expectedResult) }
     }
 
     @Test
-    fun shouldCreateEventWithoutProvidingUuidAndAuthor() {
-
+    fun `should create event without providing uuid and author`() {
+        //given
         val command = CreateArt(resource = EVENT_ART_CREATED.resource(), addedBy = EVENT_ART_CREATED.addedBy())
-        val optionalEvent = handler.dispatch(command, ArtHistory.initialize(command.artId)).blockOptional()
+        val initializedHistory = ArtHistory.with(command.artId)
+        val expectedEvent = ArtCreated(
+                command.artId,
+                command.version(),
+                command.timestamp(),
+                command.author(),
+                command.resource(),
+                command.addedBy(),
+                command.artGenre(),
+                command.artStatus()
+        )
+        val expectedSnapshot = ArtAggregate.replayAll(ArtHistory.with(command.artId, listOf(expectedEvent.asDescriptor())))
+        val expectedResult = ProcessingResult(expectedEvent, expectedSnapshot)
 
-        assertTrue(optionalEvent.isPresent)
-        optionalEvent
-                .map { event -> event as ArtCreated }
-                .map { event ->
-                    assertAll("should have proper values - provided or default",
-                            { assertEquals(EVENT_ART_CREATED.name(), event.name()) },
-                            { assertEquals(EVENT_ART_CREATED.version(), event.version()) },
-                            { assertEquals(EVENT_ART_CREATED.resource(), event.resource()) },
-                            { assertEquals(EVENT_ART_CREATED.addedBy(), event.addedBy()) },
-                            { assertEquals(ArtGenre.UNDEFINED, event.artGenre()) },
-                            { assertEquals(ArtStatus.ACTIVE, event.artStatus()) }
-                    )
-                }
-    }
+        //when
+        val optionalResult = handler.dispatch(command, initializedHistory).blockOptional()
 
-    @Test
-    fun shouldReturnExceptionOnNotEmptyHistory() {
-
-        val shouldBeError = handler.dispatch(CREATE_ART, ArtHistory.withEvents(listOf(EVENT_ART_CREATED)))
-
-        assertThrows<CommandProcessingFailure>("Should throw command processing failure") { shouldBeError.block() }
+        //then
+        assertTrue(optionalResult.isPresent)
+        optionalResult
+                .map { result -> assertThat(result).isEqualTo(expectedResult) }
     }
 }

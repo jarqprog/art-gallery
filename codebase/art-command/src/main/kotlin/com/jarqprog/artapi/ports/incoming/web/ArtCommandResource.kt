@@ -1,6 +1,6 @@
 package com.jarqprog.artapi.ports.incoming.web
 
-import com.jarqprog.artapi.applicationservice.CommandHandling
+import com.jarqprog.artapi.domain.CommandHandling
 import com.jarqprog.artapi.applicationservice.commands.ChangeResource
 import com.jarqprog.artapi.applicationservice.commands.CreateArt
 import org.slf4j.LoggerFactory

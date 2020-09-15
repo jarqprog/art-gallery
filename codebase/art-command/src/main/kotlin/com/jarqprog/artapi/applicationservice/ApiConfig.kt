@@ -2,7 +2,8 @@ package com.jarqprog.artapi.applicationservice
 
 import com.jarqprog.artapi.applicationservice.dispatching.CommandDispatcher
 import com.jarqprog.artapi.applicationservice.validation.CommandValidator
-import com.jarqprog.artapi.applicationservice.publishing.EventPropagator
+import com.jarqprog.artapi.applicationservice.publishing.ChangesPropagator
+import com.jarqprog.artapi.domain.CommandHandling
 import com.jarqprog.artapi.ports.outgoing.eventstore.EventStore
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
@@ -15,7 +16,7 @@ class ApiConfig {
     fun commandHandling(@Autowired eventStore: EventStore): CommandHandling {
         return CommandHandler(
                 CommandDispatcher(CommandValidator()),
-                EventPropagator(eventStore),
+                ChangesPropagator(eventStore),
                 eventStore
         )
     }

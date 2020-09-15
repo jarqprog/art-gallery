@@ -22,15 +22,10 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3")
     implementation("io.vavr:vavr-kotlin:0.10.2")
     runtimeOnly("io.r2dbc:r2dbc-postgresql")
-    testImplementation("org.springframework.boot:spring-boot-starter-test") {
-        exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
-    }
+
     testImplementation("io.projectreactor:reactor-test")
-
-    implementation(project(":art-domain"))
-    testImplementation(project(":art-test-support"))
-
 }
+
 tasks.withType<Test> {
     useJUnitPlatform()
 }

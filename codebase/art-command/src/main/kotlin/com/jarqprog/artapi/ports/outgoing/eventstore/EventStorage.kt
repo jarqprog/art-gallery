@@ -1,12 +1,10 @@
 package com.jarqprog.artapi.ports.outgoing.eventstore
 
-import com.jarqprog.artapi.domain.ArtHistory
+import com.jarqprog.artapi.applicationservice.ProcessingResult
+import com.jarqprog.artapi.domain.art.ArtHistory
 import com.jarqprog.artapi.domain.events.ArtCreated
 import com.jarqprog.artapi.domain.events.ArtEvent
 import com.jarqprog.artapi.domain.vo.Identifier
-import com.jarqprog.artapi.ports.outgoing.eventstore.entity.ToDescriptor
-import com.jarqprog.artapi.ports.outgoing.eventstore.entity.FilteredHistoryTransformation
-import com.jarqprog.artapi.ports.outgoing.eventstore.entity.HistoryTransformation
 import com.jarqprog.artapi.ports.outgoing.eventstore.exceptions.EventStoreFailure
 
 import org.slf4j.LoggerFactory
@@ -14,59 +12,55 @@ import reactor.core.publisher.Mono
 import java.time.Instant
 
 class EventStorage(
-        private val eventStreamDatabase: EventStreamDatabase,
-        private val snapshotDatabase: SnapshotDatabase
-) : EventStore {
+        private val eventStreamRepository: EventStreamRepository,
+        private val snapshotRepository: SnapshotRepository
+): EventStore {
 
-    private val eventToDescriptor = ToDescriptor()
-    private val historyTransformation = HistoryTransformation()
-    private val filteredHistoryTransformation = FilteredHistoryTransformation()
-
+    private val snapshotPersistingFrequency = 2//todo should be parametrized
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    override fun save(event: ArtEvent): Mono<Void> {
-        logger.debug("about to save $event")
-        return when (event) {
-            is ArtCreated -> initializeStream(event)
-            else -> appendToStream(event)
+    override fun save(processingResult: ProcessingResult): Mono<Void> {
+        logger.debug("about to save ${processingResult.artEvent}")
+        return when (processingResult.artEvent) {
+            is ArtCreated -> initializeStream(processingResult.artEvent)
+            else -> appendToStream(processingResult)
         }
     }
 
     override fun load(artId: Identifier): Mono<ArtHistory> {
-        return eventStreamDatabase.load(artId)
+        return eventStreamRepository.load(artId)
                 .doOnNext { logger.debug("fetching history for art id: $artId") }
                 .filter { events -> events.isNotEmpty() }
                 .doOnNext { logger.debug("fetched history for art id: $artId") }
-                .map { historyDescriptor ->
-                    historyTransformation.asHistory(historyDescriptor,
-                            snapshotDatabase.loadLatest(artId))
-                }
+                //fetch optional snapshot
+                .map { eventDescriptors -> ArtHistory.with(artId, eventDescriptors) }
     }
 
     override fun load(artId: Identifier, stateAt: Instant): Mono<ArtHistory> {
-        return eventStreamDatabase.load(artId)
+        return eventStreamRepository.load(artId)
                 .doOnNext { logger.debug("fetching history for art id: $artId") }
                 .filter { events -> events.isNotEmpty() }
                 .doOnNext { logger.debug("fetched history for art id: $artId") }
-                .map { historyDescriptor -> filteredHistoryTransformation.asHistory(artId, historyDescriptor, stateAt) }
+                .map { historyDescriptor -> ArtHistory.from(artId, historyDescriptor, stateAt) }
     }
 
     private fun initializeStream(event: ArtCreated): Mono<Void> {
         return validateVersionOnInitializingHistory(event)
                 .flatMap(this::preventOverridingStream)
-                .map(eventToDescriptor::apply)
-                .flatMap(eventStreamDatabase::save)
+                .map(ArtEvent::asDescriptor)
+                .flatMap(eventStreamRepository::save)
     }
 
-    private fun appendToStream(event: ArtEvent): Mono<Void> {
-        return validateVersionOnAppendingEvent(event)
-                .map(eventToDescriptor::apply)
-                .flatMap(eventStreamDatabase::save)
+    private fun appendToStream(processingResult: ProcessingResult): Mono<Void> {
+        return validateVersionOnAppendingEvent(processingResult.artEvent)
+                .map(ArtEvent::asDescriptor)
+                .flatMap { descriptor -> eventStreamRepository.save(descriptor) }
+                .thenEmpty(saveSnapshot(processingResult))
     }
 
     private fun preventOverridingStream(event: ArtEvent): Mono<ArtEvent> {
         val artId = event.artId()
-        return eventStreamDatabase.historyExistsById(artId)
+        return eventStreamRepository.historyExistsById(artId)
                 .filter { result -> result != true }
                 .switchIfEmpty(Mono.error(EventStoreFailure("History already exists for art id=$artId")))
                 .map { event }
@@ -80,10 +74,15 @@ class EventStorage(
 
     private fun validateVersionOnAppendingEvent(event: ArtEvent): Mono<ArtEvent> {
         val artId = event.artId()
-        return eventStreamDatabase.streamVersion(artId)
+        return eventStreamRepository.streamVersion(artId)
                 .switchIfEmpty(Mono.error(EventStoreFailure.notFoundBy(artId)))
                 .filter { streamVersion -> streamVersion == event.version().minus(1) }
                 .map { event }
                 .switchIfEmpty(Mono.error(EventStoreFailure("Incorrect version for $event")))
+    }
+
+    private fun saveSnapshot(processingResult: ProcessingResult): Mono<Void> {
+        logger.info("about to save snapshot for art id: ${processingResult.artIdentifier()}")
+        return snapshotRepository.save(processingResult.currentState.asDescriptor())
     }
 }

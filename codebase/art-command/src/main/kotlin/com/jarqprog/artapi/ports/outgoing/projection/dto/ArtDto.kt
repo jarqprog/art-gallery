@@ -1,9 +1,8 @@
 package com.jarqprog.artapi.ports.outgoing.projection.dto
 
-
-import com.jarqprog.artapi.domain.ArtAggregate
-import com.jarqprog.artapi.domain.ArtGenre
-import com.jarqprog.artapi.domain.ArtStatus
+import com.jarqprog.artapi.domain.art.ArtAggregate
+import com.jarqprog.artapi.domain.art.ArtGenre
+import com.jarqprog.artapi.domain.art.ArtStatus
 import com.jarqprog.artapi.domain.vo.Author
 import com.jarqprog.artapi.domain.vo.Resource
 import com.jarqprog.artapi.domain.vo.User

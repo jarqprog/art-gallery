@@ -1,11 +1,12 @@
 package com.jarqprog.artapi.applicationservice.validation
 
-import com.jarqprog.artapi.domain.ArtAggregate
-import com.jarqprog.artapi.domain.ArtHistory
+import com.jarqprog.artapi.domain.art.ArtAggregate
+import com.jarqprog.artapi.domain.art.ArtHistory
 import com.jarqprog.artapi.applicationservice.commands.ArtCommand
 import com.jarqprog.artapi.applicationservice.commands.ChangeResource
 import com.jarqprog.artapi.applicationservice.commands.CreateArt
 import com.jarqprog.artapi.applicationservice.exceptions.CommandProcessingFailure
+import com.jarqprog.artapi.domain.CommandValidation
 import reactor.core.publisher.Mono
 
 class CommandValidator : CommandValidation {
